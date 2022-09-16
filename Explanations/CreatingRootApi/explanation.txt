@@ -1,0 +1,108 @@
+To Create a Planet we'd need to add a Route API 
+
+Let's open up our server.test.ts (API Integration test file)
+
+so let's open up the terminal typing 
+
+npm test -- --watch
+
+that allows us to watch our test so that we actually change 
+them the test will automatically rerun
+
+so no tests have changed since we last run  it and we can just press A to run all the test 
+so let's copy the existing test that we have  for our get planets route, 
+paste it in the same route changing the GET to te POST 
+
+changing the internal properties of its object into having an 
+array of planets being one planet, not an array anymore but an object
+removing the id, createdAt, updateAt as well as we not need posting it as it is automatically generated 
+we not gonna pass description (optional), 
+leaving diameter, and moons 
+change its name cause it is a single planet from planets > planet
+
+const planet = {
+        name: "Mercury ",
+        diameter: 543,
+        moons: 5454,
+       
+    };
+
+    this is the actual data we'll be posting into our api 
+
+for now we can remove the mock 
+
+`
+//@ts-ignore
+    prismaMock.planet.findMany.mockResolvedValue(planets);
+`
+
+the inner request to post /planet root expecting response to be 201
+201 is the http status code something new has been created and then 
+we're going to say that we expect a response Content-Type to the application json so we can leave it the same 
+and we're going to expect the response.body to equal planet(single one)
+
+now our test shouldnt pass cause we havent yet created this post's planets route 
+in our api yet 
+
+so let's go to app.ts and create that 
+creating an another route but having the post properties
+
+but in the body we gonna remove `const planets = await prisma.planet.findMany();`
+placing 
+
+`  const planet = request.body;
+` 
+so this is the body of our request that we sent through with that planet data 
+and we say response.status().json(planet)
+
+app.post("/planets", async (request, response) => {
+    const planet = request.body;
+
+    response.status(201).json(planet);
+});
+
+so we're now not saving anything to the database 
+its just going to send back the request body that will be sent beck as response.body
+
+to handle json and to be able to pass it we make the request 
+in server.test.ts 
+we need to our response to be send after the post method 
+so we add 
+
+.send(planet)
+
+cause it is what we want to pass, planet object 
+so our planet will be now sent in the request as a json request body
+
+now for our app to be able to 
+handle a jhson request body we need to use a little bit of 
+express middleware 
+this is the build in express json body pass the middleware 
+we need to do this before any of our routes 
+after we created app instance so we say
+` app.use(express.json())`
+to  use this middleware express.json()
+
+and we can see that that's a built in middleware and what that does is that when a request comes through our server 
+and the request content type is application json it goes the to go and pass that and take that json string thats come 
+in and pass into an object that we can use in our js code and we can access that as request.body 
+in our roots 
+so now we have changed our changes the tests are passing 
+
+so we've created a test to start with where we've got post planets and we're posting 
+in the new planet we gave as post object 
+
+so now we can go and test it in postman 
+
+we will create a new request 
+it is going to be /planets as well we ll say give this a bit 
+more of a description adding - valid because this is a valid request(we will do an unvalid one later)
+
+let's change the http method to post and we're posting to our planets route
+
+now what we want to do in terms of sending in a response body is we can look andset the body as raw, setting the type to json
+then using the app,.ts object we named planet pasting it into postman json body we just settd
+we need to format it as valid json (keys need to be quoted)
+
+before the real request we need to start our server running, stopping the test and then npm run dev 
+
