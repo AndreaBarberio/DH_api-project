@@ -1,0 +1,16 @@
+GET http://localhost:3000/planets
+Error: connect ECONNREFUSED 127.0.0.1:3000
+
+Request Headers
+User-Agent: PostmanRuntime/7.29.2
+Accept: */*
+Postman-Token: 21b3c91a-8839-4e69-980c-d614ca2ede7b
+Host: localhost:3000
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+
+
+YOU PROBABLY NEED TO RUN THE SERVER WITH 
+
+npm run dev 
+

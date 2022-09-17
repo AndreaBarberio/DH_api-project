@@ -1,0 +1,432 @@
+DATA VALIDATION 
+is important to build secure web aplpications 
+in this lesson we're going to validate the data thats' received bhy our create planner api route 
+we want to handle any invalid request to our api so we want to makesure the data thats in this request bodyis actyally valid:
+this will help keep our API secure and it will avoid restoring invalid junk data in our database
+
+in order to do this we're going to add some tests first 
+and we'll head to our server.test.ts
+where we've got our existing test for the post planets route 
+and we're gonna refactor it a bit
+we will wrap it in a describe block 
+      a described block allows us to group some tests together
+we're gonna change the code putting describe block between the tests we've got 
+it is gonna describe "POST /planets", and will have an arrow function as second parameter that will wrap the test of our /planet route 
+
+so paste 
+
+`
+
+test("POST /planets", async () => {
+    const planet = {
+        name: "Mercury",
+        diameter: 1234,
+        moons: 1545,
+    };
+
+    const response = await request
+        .post("/planets")
+        .send(planet)
+        .expect(201)
+        .expect("Content-Type", /application\/json/);
+
+    expect(response.body).toEqual(planet);
+});
+
+
+`
+and put in that arrow function scope 
+
+so now we can rename that test to be valid request cause we're making a valid request to our api 
+now we're going to actually add a new test 
+where we're making an invalid request and so we'll paste that in a second time below the first one and then 
+change the titles to invalid request as we did for the valid one 
+to make this an invalid request we're going to change it so this name here is not passed through, 
+so a name is a required field that we need to store in our database for every planet but for this request(invalid one), for this test, we're not passing that through
+then we want our api route, when we post stuff through, to be able to handle this
+
+`
+app.post("/planets", async (request, response) => {
+    const planet = request.body;
+
+    response.status(201).json(planet);
+});
+`
+
+that we've got in our app.ts
+
+so it wont be giving us a 201 which is a succesfull response of stuff added 
+it wont' besaying everything is okay , but something went wrong 
+so the data we sent through is incorrect 
+now we'll be sending through error messages in our response 
+but the httpstatus code should reflect that too 
+
+422 UNPROCESSABLE ENTITY 
+The HyperText Protocol (HTTP) 422 Unprocessable entity response status code
+indicates that the server understands the content type of the request entity 
+and the syntax of the request entity is correct, 
+but it was unnable to process the contained instructions 
+
+as we're sending thorough a json data when we send our request body the planet we POST will come through as json through our api
+so 422 means we've been able to pass that json but that actually 
+of it wasn't 
+correct and in this case for this test 
+it's because we've left out the name 
+so we'll change the expected status code in our invalid request to 422 in the response
+and as we're not expecting a succesfull response even the expect of our response.body may change: 
+we're going to expect an object which contains errors property, 
+so from 
+`
+  expect(response.body).toEqual(planet);
+`
+it becames 
+`
+expect(response.body).toEqual({
+            errors:{
+                body:expect.any(Array)
+            }
+        });
+`
+because the errors are gonna be expected as any type of Array
+
+so now we're expecting our response body from our api when we send 
+an invalid request thrpugh to respond with a 422 
+and a response.body to be an object containing an errors property which has a object containing a body property which contains an array of errors 
+
+so if we save this and run our test in watch mode 
+
+we will see our test failing cause we've got a 201 created and we dont have any VALIDATION
+ON OUR API route 
+right now it is just accepting any request body that comes through 
+so we can actually push through any data we want through our api 
+and it will accept it and thats not a safe situation 
+so let's go and add some validation to our api: 
+let's stop our test running 
+
+so we can then head and take a look at the express json validator middleware package 
+this is a middleware package for express that we're going to install 
+
+express-json-validator-middleware 
+
+and it allows us to integrate validation 
+
+to work with that we also need and want to install the ajv formats library 
+and we're going to install ajv formats that will give us some extra validation formats for example allows us to validate 
+weather pieces of data are a date or time or a url or email address
+we cann add it in the code in our terminal that was adding json valideator for express and install it together so type :
+
+npm install express-json-validator-middleware ajv-formats
+
+we can see it in the package.json 
+
+so now let's create a new directory under lib, in src folder and let's call it validation 
+
+inside of 
+
+validation
+
+ we need to create a new file: 
+
+index.ts 
+
+
+inside of it let's
+
+ import the addFormats from "ajv-format" 
+ 
+ package
+
+ and also import { Validator, ValidationError} classes from "express-json-validator-middleware" package
+
+ then we can create a new instance of the validator class 
+
+ const validator = new Validator();
+
+ and we add Formats to it 
+
+ addFormats(validator)
+
+ this is some CONFIGURATION OF AJV and this is the underlying library 
+ that is used by express-json-validator-middleware 
+ we want to tell it we want it to be able to understand if wewant to validate 
+ date and time in our valideation schemas also gonna add some keywords, which are
+ kind 
+ &
+ modifier using .addKeyword("with the keyword we wanna add")
+ this is just setting things up so we can add another library in a moment that will actually help us with the validation so we adding kind modifier keywords 
+ the we can go ahead and 
+
+ export const validate = validator.validate
+
+ so this validator instance we created here `const validator = new Validator();`
+
+ we're going to access the validate property and wxport it from this module as a validate constant 
+
+ so then we can go ahead and import the validate const and use this in app.ts importing it in the top of the app.ts document 
+it is enough to say it is from validation folder the it automatically understands it is from index.ts 
+
+now we've imported it we need to use it so on our post planet route we want to validate the request body data 
+so we're going to call validate function befor the async one
+
+so we see when we create the instance and export it we have a validate function we can use 
+and we can call what we've exported 
+
+we will pass to the validate funcion in app.ts an options object that contains a property body so 
+that tells it that we want to validate the request body and then we gonna give it an empty object 
+
+then let's save that and 
+we'll now go and install
+
+SOMENTHING THAT ALLOWS US TO GIVE SOMETHING THAT WE CAN PASS THROUGH here
+
+and that's something is a schema that will allow us to say here is the structure of the data that we're expecting 
+and then it will check the request body data against that structure and see if ecerything is correct so we going to go and install 
+another package: 
+
+@sinclair/typebox 
+
+this helps us build a json schema and that's the way we will describe the data we're expecting 
+it works really nice with typescript becas we can also get types for oour data from it so let s install it 
+now that it is installed we can go ahead and use it 
+
+so let's create a NEW FILE under the validation directory that does planet validation so let us call it
+
+ planet.ts
+
+ once it is created let's use it to define some kind of schema to 
+ describe our 
+ planet data 
+
+ if we take a look at how a valid request looks like when we're posting through the name 
+ diameter and moons so those are the required fields 
+ and we've also got optional fields so 
+ for a full idea of what we are expecting
+
+ let's take a look at our db schema;
+
+ model Planet {
+id                     Int      @id @default(autoincrement())
+name                   String   @db.VarChar(255)
+description            String?
+diameter               Int
+moons                  Int
+createdAt              DateTime @default(now())
+updateAt               DateTime @updatedAt
+}
+
+
+these:
+name                   String   @db.VarChar(255)
+description            String?
+diameter               Int
+moons                  Int
+
+are the fields we want to validate in the request body before we do anything with them 
+
+so lets keep it to the right so it is possible to taka a look at it while we are creating the schema 
+in planet.ts
+ 
+ so now we can go into our planet.ts and import {Static, Type} from "@sinclair/typebox";
+ then we'll export const planetSchema and this is going to be where we're going 
+ to build up our schema so we'll say 
+ 
+ Type.Object({
+name: Type.String()
+ })
+because the request body that we're expecting to come through is an object with a name property with a Type of string so Type.String()
+the description is gonna be Type.Optional so this tells us that we're having an optional property 
+and we can say inside of that Type.String()
+then we will set the diameter which is goin to be an integer so Type.Integer() as for the moons 
+and this all lining up again with what we have got in our database schema 
+
+by default all fields are required unless we say theyre optional like we did for description 
+
+now we've done that we can go and add 
+one extra setting after the schema but still as parameter to an object containing the property additionalProperties: false
+it says that the request comes through and it's got fields that arent any of these that will fail the validation 
+
+that means that we can avoid getting extra junk data coming along with a request or even just mistakes that come through 
+
+and it means our validation is a lot STRICTER 
+that will only be accepting fields we set in the Type.Object({})
+
+we can actually now infer a type for the schema so we'll say export type Planet data = Static <typeof planetSchema> 
+this means that we have inferred a type from our planet schema and we can see here we now have a PlanetData ype for
+the planet object so we can go and use throuhout our code 
+
+now we've exported the planet schema and tthe type we're going to close 
+our prismaSchemaand the open up index.ts 
+in there we gonna export * (everything) from "./planet" schema file 
+
+that means the planet schema and planet data types will be made available
+when we import this file which we're importing in app.ts 
+so let's update what we're importing here in app.ts
+
+changing import {validate} from "./lib/validation";
+into 
+import { 
+    validate,
+    planetSchema,
+    PlanetData
+ } from "./lib/validation";
+
+ and let's change even what we have where we're making our validation 
+
+ app.post("/planets", VALIDATE({ body: {} }), async (request, response) => {
+    const planet = request.body;
+
+    response.status(201).json(planet);
+});
+from an empty body
+INTO 
+that planetschema
+validate({ body: {planetSchema} })
+
+and this planetSchema is that full schema we have set into planet.ts before saying what we expect the rewuest body to contain (to be an object with the fields we wrote into it)
+
+so now we can even use that planet data type as well because we know now that request body once it's been validated if it is valid 
+it should be a type PlanetData which contains all that different properties and relative types we set 
+
+we've now got a fully type request body and we can go ahead and test our validation in 
+POSTMAN
+so if we open it and make an invalid request duplicating our wxisting one changing name to invalid andbody into 
+so it is invalid if we dont' pass thrpugh a name as that's 
+a required property and so we'll delete that and save 
+
+we even need to npm run dev before to send our request 
+
+as we have 
+src/lib/validation/index.ts:1:24 - error TS2307: Cannot find module 'ajv-format' or its corresponding type declarations.
+
+1 import addFormats from "ajv-format";
+                         ~~~~~~~~~~~~
+
+src/lib/validation/index.ts:4:19 - error TS2554: Expected 1 arguments, but got 0.
+
+4 const validator = new Validator();
+                    ~~~~~~~~~~~~~~~
+
+  node_modules/express-json-validator-middleware/src/index.d.ts:23:15
+    23   constructor(options: AjvOptions);
+                     ~~~~~~~~~~~~~~~~~~~
+    An argument for 'options' was not provided.
+
+
+Found 2 errors in the same file, starting at: src/lib/validation/index.ts:1
+
+we've missed a type so let's go to planet.ts 
+actually it is in index.ts invalidation we need to pass an empty object into the validator instance
+
+so if we now run it again paying attention not to have any mispells 
+
+now we can go to postman and try again we will se a new error 
+
+<pre>JsonSchemaValidationError<br> &nbsp; &nbsp;at 
+/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/src/index.js:61:10<br> &nbsp; &nbsp;
+at newFn (/home/andrea/DH_api-project/node_modules/express-async-errors/index.js:16:20)<br> &nbsp; 
+&nbsp;at Layer.handle [as handle_request]
+(/home/andrea/DH_api-project/node_modules/express/lib/router/layer.js:95:5)<br> 
+&nbsp; &nbsp;at next (/home/andrea/DH_api-project/node_modules/express/lib/router/route.js:144:13)<br> &nbsp;
+&nbsp;at Route.dispatch (/home/andrea/DH_api-project/node_modules/express/lib/router/route.js:114:3)<br>
+&nbsp; &nbsp;at newFn (/home/andrea/DH_api-project/node_modules/express-async-errors/index.js:16:20)<br> &nbsp;
+&nbsp;at Layer.handle [as handle_request] (/home/andrea/DH_api-project/node_modules/express/lib/router/layer.js:95:5)<br> 
+&nbsp; &nbsp;at /home/andrea/DH_api-project/node_modules/express/lib/router/index.js:284:15<br> &nbsp; &nbsp;at Function.process_params 
+(/home/andrea/DH_api-project/node_modules/express/lib/router/index.js:346:12)<br> &nbsp; &nbsp;at next 
+(/home/andrea/DH_api-project/node_modules/express/lib/router/index.js:280:10)</pre>
+
+this internal 500 server error 
+then it says json schema validation so it looks like our validations worked but we've got this kind of 
+slightly weird response with all these extra  stack trace information about the js errors happened in our code 
+
+express by default has  a builtin error handler that sends a 500 html error responsenow we want to intercept 
+when we have a json schema validation error and actually handle it ourselves to seend a better structured json response 
+
+
+so if we head back over into our index.ts 
+where we've got everything validating we can go and change that and add in that we're going to export a validation 
+middleware 
+
+so 
+
+export const validationErrorMiddleware 
+
+
+this validationErrorMiddleware is going to add to handle validation errors so it is going to accept errors 
+request response ad next 
+these are all things that come through from express so we'll be integrating 
+it with our api in just a moment 
+inside of this handler we actually want to 
+make sure that we've got the type set correctly so 
+we can see we've got ambiguos error type in --\
+                                               \  
+export const validationErrorMiddleware = (error, request, response, next)
+
+so let's go on the top of the document and import ErrorRequestHandler from 'Express'
+now we can use that type and add it to validationErrorMiddleware: ErrorRequestHandler
+
+inside of this error handler we gonna say (error instanceof ValidationError) it will throw a validation error and that gets passed and 
+that's what we want to catch here 
+so if the if condition is accepted we will send back a different response 
+response.status(422) and we will use the status 422
+
+that is gonna .send({}) back the error object so in the {errors:error.validationErrors}
+
+then what we0ve done that we need to call next() wjhich 
+is a special function of express that  is passed into every middleware and it allows us to call the next middleware 
+so it is importatnt that we call this in case there are any middleware that need 
+to run after this one 
+
+after the if 
+
+we have to out an else 
+
+that in case we gain a validation error it will run our code to handle it and send back 
+specifically formatted error response and otherwise we're gonna say next(error)
+and we passing on that error that will go into the express default muiltin error handler middleware
+
+SO NOW WE VE GOT MIDDLEWARE WE CAN USE GON TO HEAD BACK overINTO OUR APP.TS AND PULL IN THAT 
+MIDDLWEARE 
+SO we will say validationError (the one we just created)
+
+then copy that name and down the app.ts doc, after all the routes
+(importatn with error handling to put it at the end before the export)
+because they have to run after the routes have handled the request 
+
+app.use(validationErrorMiddleware)
+
+so that when the request comes in it will come throuh to our post /planets route
+it will get validated 
+app.post("/planets", /////validate({ body: planetSchema })
+by the validation schema we created and if there is an error 
+it will then come into this 
+
+
+app.use(validationErrorMiddleware); 
+
+ErrorHandler middleware we're gonna check in 
+
+and if it is a praticular validation error instance will then handle it and send back response 
+
+now if we save these changes we can stop our server 
+and test if our test is working so this test 
+that we created should be PASSING NOW
+
+npm test 
+so if we now get or server running we can see sending our requestthe error object is nicely structured 
+
+:D 
+
+so now we can refactor test a bit 
+so whhere we had the describe we can do the same for get planets 
+so copy that in
+
+ server.test.ts
+
+and do a valid request in describe for the Get method too
+
+
+
+
+  
+
+ 

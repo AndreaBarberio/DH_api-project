@@ -1,0 +1,17 @@
+src/lib/validation/index.ts:1:24 - error TS2307: Cannot find module 'ajv-format' or its corresponding type declarations.
+
+1 import addFormats from "ajv-format";
+                         ~~~~~~~~~~~~
+
+src/lib/validation/index.ts:4:19 - error TS2554: Expected 1 arguments, but got 0.
+
+4 const validator = new Validator();
+                    ~~~~~~~~~~~~~~~
+
+  node_modules/express-json-validator-middleware/src/index.d.ts:23:15
+    23   constructor(options: AjvOptions);
+                     ~~~~~~~~~~~~~~~~~~~
+    An argument for 'options' was not provided.
+
+
+Found 2 errors in the same file, starting at: src/lib/validation/index.ts:1

@@ -1,0 +1,26 @@
+5:42:58 PM - File change detected. Starting incremental compilation...
+[build:dev] 
+[start:dev] [nodemon] restarting due to changes...
+[build:dev] 
+[build:dev] 5:42:58 PM - Found 0 errors. Watching for file changes.
+[start:dev] [nodemon] starting `node --enable-source-maps dist/server.js`
+[start:dev] /home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/util.ts:211
+[start:dev]   if (mode === true) throw new Error(msg)
+[start:dev]                            ^
+[start:dev] 
+[start:dev] Error: strict mode: unknown keyword: "planetSchema"
+[start:dev]     at checkStrictMode (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/util.ts:211:28)
+[start:dev]     at checkUnknownRules (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/util.ts:27:22)
+[start:dev]     at checkKeywords (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/validate/index.ts:153:20)
+[start:dev]     at validateFunctionCode (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/validate/index.ts:40:5)
+[start:dev]     at Ajv.compileSchema (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/compile/index.ts:163:25)
+[start:dev]     at Ajv._compileSchemaEnv (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/core.ts:733:24)
+[start:dev]     at Ajv.compile (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/node_modules/ajv/lib/core.ts:385:34)
+[start:dev]     at Validator.<anonymous> (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/src/index.js:33:40)
+[start:dev]     at Array.map (<anonymous>)
+[start:dev]     at Validator.validate (/home/andrea/DH_api-project/node_modules/express-json-validator-middleware/src/index.js:26:5)
+[start:dev] [nodemon] app crashed - waiting for file changes before starting...
+
+
+
+YOU PROBABLY HAVE EMBEDDED IN SOME TYPE DECLARATION A TYPE IN A {} OR [] NOT NEEDED
