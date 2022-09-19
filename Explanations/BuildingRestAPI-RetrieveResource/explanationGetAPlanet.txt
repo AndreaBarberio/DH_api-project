@@ -1,0 +1,12 @@
+Create Api Route that can retrieve individual planet from our db 
+
+We can run our test in watch mode 
+then let's create a new route that is going to respond to  a single planet 
+we can copy the existing get planet describe block
+
+paste it to the end of our document 
+rename it o get planet adding the actual path to the url that is gonna look like 
+
+"GET /planet/:id"
+
+as it is a single planet we dpnt need the const to called planets but planet 
