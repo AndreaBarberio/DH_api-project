@@ -1,0 +1,94 @@
+SAVE THE DATA
+we're going to SAVE THE DATA THAT'S RECEIVED by our createPlanet api Route
+to our database
+let's modify the post route for planets in app.ts 
+
+le'ts change the planet variable to be planet data 
+just to clarify that is the data that we're receiving and then we're gonna make a query to 
+our db using prisma so 
+
+from 
+
+const planet: PlanetData = request.body;
+
+let's add  Data to Planet so 
+const planetData: PlanetData = request.body;
+
+then 
+
+const planet = await prisma.planet.create({
+    passing data property on this object,so
+    data:planetData
+})
+
+we take the request body and then we pass it in our prisma create methd for the planet model so 
+when we pass that data in it should then save that data into our database table
+
+now we can go to postman and after let our server start test it on postman and make our post request 
+we can see it has got the createdAt and updatedAt times
+an unique id  dinamically generated and 
+if we go to our get Planet rout where we pull back 
+all the planets and make  a request there qe can see we've got all the planets we generated and created 
+
+we've now wired up this post planets Route so 
+it is actually saving that data to the database 
+we can even test with pour api integration test in --watch mode 
+typing npm test -- --watch 
+we will see errors 
+
+in valid request so let's go to test file
+
+
+the problem is 
+
+ ● POST /planets › Valid request
+
+    expect(received).toEqual(expected) // deep equality
+
+
+what we having back here 
+    Expected: {"diameter": 1234, "moons": 1545, "name": "Mercury"}
+ so 
+ it is expecting deeper quality  ,  expecting that and having nothing from 
+
+ expect(response.body)
+
+ we need to add a mock in 
+ so lets go up 
+ copy ` //@ts-ignore
+        prismaMock.planet.findMany.mockResolvedValue(planets); `
+
+        and add that in before making that request to that end point 
+        then we gonna mock out the resolvedVvalue 
+        the resolvedValue is gonna be a bit different 
+        as we have planet in the request wee need to change it even in the mock 
+
+        we not even gonna use findMany, but create
+        so the create value should be like 
+        
+        prismaMock.planet.create.mockResolvedValue(planet);
+
+        hen when we saving it is actually matching with our test passing giving back what we expect 
+
+this doesnt include the real values so let's go  and copy from postman 
+
+then when we've done it, where we added the create.mockResolvedValue
+
+we can create a new planet variable and we gonna copy that in it 
+then 
+
+we have to take the original const planet object we had before and ut it into the send method 
+
+what is happening now: we're making a request we're sending through 
+those required fields 
+
+.send({
+                name: "Mercury",
+                diameter: 1234,
+                moons: 1545,
+            })
+
+we are sending them in postman as well in our prism in our postman request, 
+so we've got that being sent through and then we 
+make call to create method, mocking mockResolvedValue   
+
