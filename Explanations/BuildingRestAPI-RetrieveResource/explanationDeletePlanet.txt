@@ -1,0 +1,265 @@
+
+in this lesson we're going to create an
+api route that deletes an existing
+planet from our database
+let's run all of our tests in watch mode
+and we're going to create some tests for
+this new delete route
+and this delete route will use the
+delete http method
+and we'll copy these get planet by id
+tests because our delete tests will be
+fairly similar
+so we've selected all those and that
+covers
+a valid request a planet does not exist
+and an invalid planet id so we'll copy
+these and then we'll go and post them
+right or paste them right down at the
+end
+of our test file
+and
+then when we scroll up a little bit
+we'll start
+refactoring things so we're going to
+rename this to be delete
+and that's the http method we're going
+to be using
+we're not going to expect any response
+data to come back from this so we don't
+actually need a mock for this valid
+request
+so we will be changing this here to be
+making a delete request and so we change
+this to delete
+and we're going to expect a 204
+http status code
+now a 204 http status code means no
+content so we're not going to actually
+be sending back a response body this is
+a conventional way of doing things in a
+restful api when a delete request is
+successful we send back a 204 which is
+in the success http status code range
+but it's saying there's no content so
+the client knows there's nothing there
+to pass
+and the the record has been successfully
+deleted so we're not expecting any
+content in the response body so there'll
+be no content type header and we're
+going to expect the response text
+to be equal an empty string so there'll
+be no data coming back from that
+now if we want to look at the planet
+does not exist test we're going to
+change that a bit as well we do want it
+to actually
+handle things so
+we want to do a mock here for
+the delete method on on the prisma
+client
+and we're going to change this to
+mock rejected value
+and that will be a new error
+so if we make a delete request for a
+planet that does not exist it will try
+and delete something by that id and then
+the prisma client is going to actually
+reject with an error so we need to be
+simulating that here with the prisma
+mock and now we're going to actually
+change this test so that it's actually
+making a
+delete request
+and we're going to expect a 404 still
+but we expect the response in the error
+message to have uh cannot delete
+and then the planet's url
+so that's that test handled for planet
+does not exist and then for invalid
+planet id we're going to change this
+again to be a delete and this is where
+the the planet id just doesn't exist
+this is like not a real planet id it
+should be a number so we're expecting a
+404 still and we're just going to change
+this error response over here
+now
+if we save this
+we'll see that we've got failing tests a
+couple of them are actually passing
+because we're getting 404s back and
+that's because we haven't actually
+created this route yet so we'll go ahead
+and start creating this route we're
+going to copy the put planet's id route
+and that's this one that we have up
+above here
+so we'll copy put planet's id because
+it's going to be quite similar in terms
+of the logic that we have inside of it
+so we're going to change the method on
+this to be going to use the delete http
+method for this route the url path will
+still be the same slash planets with an
+id on the end that isn't must be a
+number
+we don't actually require any validation
+for this route because there's no
+request body so we'll remove that
+and we're going to remove the planet
+data because there's no request body
+data the planner id will need here for
+our request
+and we're going to actually change this
+here
+we don't want to be passing through any
+data because we don't have any and we'll
+change this to be a delete
+so we're now awaiting
+prisma.planet.delete there's not going
+to be any data coming back from this so
+we don't need it to be assigned to a
+variable
+and we're actually going to
+replace this here with a dot end
+and that makes sure we end the request
+but we're just going to send that 204
+status code and then we're going to
+change this message here in the catch
+block
+to cannot delete
+so what we've got now is a delete route
+that when we make a valid request where
+it's got the id a number in the url
+we'll then use that with the
+prismaclient's delete method to try and
+delete it if there's an error it will
+get caught here and we'll send back a
+response saying that it wasn't found we
+couldn't find that record to delete if
+it was successful we'll send back a 204
+which tells the client there's no actual
+response body and we we call this dot
+end to make sure that we actually finish
+sending back the response so now if we
+go ahead and actually save this
+we should see that all our tests are
+passing so our new delete test for valid
+request plan does not exist and invalid
+planet id are all working
+so we're going to now start up the
+server and test these routes in postman
+once the server is running with npm run
+dev
+we'll go and create some new routes here
+so let's actually create a
+new
+request
+and this is going to be to slash planets
+slash and that's the id this is going to
+be a valid request
+and we're going to be making a delete
+request let's change the method here
+so
+to http localhost and we can make a
+valid request to
+plan it let's do a different planet to
+planet one
+if we make a get request here we can see
+all the different planets
+and
+we will be updating
+number two venus so we're actually going
+to delete planet two so there's a delete
+request there so that's for a valid
+request this will actually permanently
+remove it from the database so if we go
+ahead and make this delete request now
+we'll save it first and then we'll send
+it we'll see that we've got an error
+back so cannot delete planet two
+now we can go and actually take a look
+at why that is i think our data here
+might be out of date
+if we send a request again
+for planet two that's something's not
+quite right here and
+we're going to
+have to have a look how we've made a
+mistake here in the euro so that should
+be planets
+and
+not planet so we'll close this here
+and then
+send the request
+so we can see now that we've got that
+204 no content response and we've got no
+response body
+it's really easy to make little mistakes
+in the urls so definitely a good thing
+to check for is that the url is correct
+because we had a 404 come back there
+and because that route didn't exist so
+always worth checking those routes so
+we've now deleted that record from the
+database and if we head back we'll save
+this here
+now we've corrected the url and if we
+head to this get planets we'll see that
+actually venus no longer exists because
+we've deleted it and we've got two
+mercuries in our database
+so now that we've done that we can
+actually go and create another route so
+this is going to be
+for a planet that does not exist so
+we'll duplicate this one
+close this one here
+open this duplicate and then we'll
+change this to planet does not exist
+and then here we'll just change this to
+a random
+id
+23
+and then we can save this and then we'll
+send through this request
+and we'll see that we get a 404 which is
+what we're expecting because we've got
+that error handling there in our code
+where if we if we get an error come back
+from prisma we actually catch it and
+then send back that error response with
+the 404
+and then lastly we're going to duplicate
+this and say we'll pass through an
+invalid planet id
+so this is where it's not actually a
+number so invalid planet id and we'll
+just use that junk string we've been
+using before asdf will save this request
+and if we send that through with postman
+we'll see that again we get that cannot
+delete planets asdf and that's because
+express is sending back a 404 because
+our route only matches if it contains a
+number for the id
+so we've got a complete
+delete route which is working in terms
+of all the error handling that we need
+for the different kinds of scenarios
+so let's go ahead and stop our server
+running
+and run get status to see the changes
+we've made
+and we'll add them
+and then we're going to say git commit
+um
+add
+delete
+planets
+id route
+and then we can get push
+now our api can create retrieve update
+and delete planets
