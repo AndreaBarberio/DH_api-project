@@ -1,0 +1,448 @@
+put and then let's pass through the
+planet id in the url which here is three
+and so we're going to say planets
+three and that will then send through a
+put request and we're going to send
+through this information we're going to
+actually add um a description here so
+we're now adding something new in
+and say this is a lovely planet
+and then we can actually
+go and make sure we set that on what our
+mock's going to resolve with
+so the marks resolving with what comes
+back from the database when it's
+actually updated things so we can just
+take that description
+and then paste that here
+so this is the request body data that
+we're sending through
+here this object so we'll be sending
+that as a put request and then this is
+what we're expecting back from the
+prismaclient once we've updated our
+database record
+so now we've done that we're also going
+to change this http status code to 200
+because it will be
+a different
+response it's just saying that
+everything's okay it's not creating a
+new object so that's an http
+okay response status code and now that
+we have that working
+we're going to actually go and
+change the
+what's happening down here and we'll
+change the invalid request one similarly
+so this invalid request we're passing
+through
+uh not enough information at all uh
+we're missing out that name and we're
+going to change this to be a put and
+there'll be planets and then
+an id
+and then we're going to be sending
+through that planet record so we're
+actually going to expect validation
+errors to come back from this route so
+we'll be putting validation on this put
+route as well the same as we have for
+our post route to make sure the request
+body data that's coming through is valid
+and that we keep things that we know we
+can trust that user input that it's how
+we expect it to be
+so there's not much to change on this
+test we're just changing how we're
+putting
+and then we can we change the url that
+we're actually making the request to
+and now if we go ahead and save those
+we'll expect to see our tests are
+failing so we've got those two failing
+tests because we don't yet have that
+route they're coming back with a 404 not
+found for putting to planet's id
+so that's fine for now we'll wait until
+we've implemented those routes now we're
+also going to add some extra tests and
+those are for ones where the url is
+invalid where the planet doesn't
+actually exist so the id
+is not valid because it's not there in
+the database and also for when a url is
+a request that is an id that is not a
+valid number so it's a string for
+example so we can go up to our get test
+for
+getting an individual planet so getting
+a planet by id
+and we can go and copy these planet does
+not exist
+and we'll copy the invalid planet id
+test
+so we'll take these ones and we're going
+to actually then move them a copy of
+them down into
+our new
+test block for the put root
+right down the bottom here
+and then we'll drop it inside that
+describe block
+and so we're going to say planet does
+not exist and then we're going to
+actually need to change things a little
+bit here
+we'll change the method here to be a put
+so we're going to be making a put
+request and so that means we need to
+actually send through a request body so
+let's copy what we've got what we're
+sending up here this planet
+uh in this valid request over here so
+we'll copy this valid request body
+so that it validates but the when we're
+gonna do some handling error handling
+around the planet not existing so we're
+putting and this is for a planet that
+does not exist so that 404 is what we'll
+expect to get back and we'll we'll
+change this error message we expect it
+to be cannot put
+to planets 23 and then we're going to
+change this mock so instead of it being
+find unique it's going to be update and
+then it's going to be mock rejected
+value
+so we actually want the prisma client
+mock to throw
+is going to reject basically with an
+error and so we don't need to worry
+about a specific error message we just
+need to make sure that it's throwing an
+error message
+and so once we've got that
+in there we need to go and actually
+update the other route
+where we're testing for the invalid
+planet id and we're going to do a put
+and
+we'll be putting through the data we
+don't actually need to send something
+here because we're not this is an
+invalid planet id that should just 404
+but we can add it in anyway for
+completeness just so it's a more
+realistic request
+and so we'll put that sending that data
+and then we're again expecting it to be
+cannot put as the response
+and so then when we actually go ahead
+and save these
+we can see what's happening with our
+tests so we've got two failing tests
+and that's our valid request is failing
+because that root does not exist
+and then we've got that invalid request
+failing again because that root doesn't
+exist
+so let's go ahead and actually create a
+new root this put root we're going to
+copy our root for the post planets which
+is down here in app in our app.ts
+and if we copy that
+and paste it in below
+we'll be saying
+app.put planets and then that's let's
+copy that pattern that we have here for
+id from that get root
+and we're going to be
+ch that will help us check for we've
+actually got
+a digit a number
+here for the id parameter we're again
+going to use that planet schema to
+validate our request body
+so then inside of this we're going to
+actually change the prisma client call
+so here we were doing create previously
+in our post root we're now going to
+change this to be an update
+so this is an update
+we'll be setting that data but we
+actually also need to add a where clause
+so this is a web property
+and we add that with an object and we're
+going to say where it is this and it's
+going to be number
+request.params dot id
+and
+then we've got that there so we're
+actually we could pull this out into its
+own variable if we wanted but we'll
+leave it there for now
+and we we're now actually going and
+updating this record instead we'll
+change the response status code to 200
+and we want to return back the planet
+that's returned by the prisma client
+so now if we go and save
+this
+we should see what's happening with our
+tests so we've got some failures still
+so let's see how we can fix them
+so we've got the the valid request is
+now working so that update where we're
+passing through a valid put request
+is actually working now so that's good
+news but we've got this invalid request
+it's failing
+and it's got a 404 not found instead of
+a 422
+so let's take a look at why that is so
+we've got this here because it actually
+instead of got planets id we actually
+need to put through a real id and so
+we'll say
+uh we'll put through
+23 so it's a real id but our request
+body is missing that name field so let's
+save that and see if that fixes our test
+so now we can see that that invalid
+request test is working we've fixed that
+url
+and then we've still got this planet
+does not exist failing
+and that's this one here with the mock
+rejected value we're getting a 500 and
+internal server error back
+now let's go and take a look at that
+and try and understand a little bit more
+about what's happening so we can start
+the server
+with npm run dev and we're going to head
+into postman and actually take a look at
+what's happening with this pert request
+so
+we will duplicate our post request that
+we have here
+and we because this is actually
+the type of thing we're testing here is
+when a planet does not exist but we we
+are going to be putting and sending this
+data so
+let's actually
+take this
+put one and
+this post one and duplicate it and this
+move it down here and then we'll change
+its name and so it's gonna be planets
+and then
+this is going to be an invalid planet id
+and so or rather a planet that does not
+exist
+and so we want to say planet does not
+exist let's just check our tests
+that is the one that's failing yet
+planet does not exist
+and we're going to then actually pass
+through
+a url 23
+and that's the planet that's not
+existing in our database
+and then we're going to do a put request
+and then let's actually save that
+request so far and then we'll copy what
+we are sending through here in our test
+so this is where a plan doesn't exist
+we're going to send through a valid
+uh request body in json format so we'll
+head here
+and we'll pull this back
+and we can then actually
+format it correctly as jason so we need
+to just add in those quotes
+and so this is going to be a request
+that we expect to fail but it's not
+failing quite how we'd hope at the
+moment so
+let's send through this request so we've
+got it sending a put request to a url
+where the planet doesn't exist
+and then we send that through and we're
+getting this 500 internal server error
+so that's what we were seeing in our
+test
+and the error that's happening we can
+see a little bit better here on our
+console if we go and look at what's
+happened here with prisma so prism is
+complaining because it depends on one or
+more records that were not found so this
+update didn't work
+so we need to actually go and add some
+testing or to check for that error case
+here so we're now going to actually
+update this and wrap this code in a try
+catch block
+so what we'll do is we'll actually
+take this here
+this number
+and we'll call that planet id and just
+so we can actually reuse it in an error
+message
+so we'll put that there as planet id and
+then we're going to wrap this whole bit
+here in a try catch block so we'll do
+try
+and then we'll
+indent all of this
+and then we'll catch the error
+and
+when we catch that error so that's that
+error that's coming out here from prisma
+when we're trying to actually save and
+or rather update a planet that doesn't
+exist in the database we're then going
+to actually
+catch that error and we're going to send
+a 404 instead we're just going to assume
+that it means it's not there in the
+database this is a
+the first basic level of error handling
+that we can add and then we say we're
+going to use express's d4 error handler
+by passing an error message saying
+cannot put and then it'll be slash
+planets
+slash and then that planet id
+so we can safely use this planet idea
+here because we know it's a number
+but it just happens to be a number that
+doesn't actually exist in our database
+so there is no
+planet existing in our database with
+that specific id so we're doing this
+error handling here we're calling the
+next function we need to make sure we
+actually add that parameter and accept
+it here on our root handler express
+automatically passes that through
+and now if we
+save that and then go ahead and run our
+test
+let's see if we've managed to fix it
+with that error handling so now that
+that test that we had that was failing
+previously that planet does not exist
+test is now
+passing because we've actually got
+correct error handling in there where
+we're sending back this correct 404
+response with that error message
+and
+we we've now got a much more robust put
+route so we've managed to create a route
+for our api which can accept a request
+body
+which is fully validated again just like
+on our post route and then we're
+actually updating that record in the
+database based on the id that was passed
+in the url which must always be a number
+and then we send that back that
+successfully saved record we sent back
+as our response body json formatted if
+things went wrong with trying to update
+it if that record wasn't found in the
+database for that id we're sending back
+an error response and that's a 404 http
+status
+so now we can actually go ahead and just
+out one more here where we've got we've
+got this planet does not exist put we
+can actually go
+and create a valid one so let's
+duplicate that and we'll say this is a
+valid request
+and
+we will
+say this is valid and this is going to
+update
+planet one and so planet one in our
+database
+if we do a get request for that
+let's have a look at what it is
+so we need to actually run our server
+and now that's running we'll go make a
+request again so this is our real record
+for mercury
+and we'll just copy part of that
+and when we make a valid put request
+this is for
+number one the planet one we're going to
+set the request body
+to be
+these fields so it'll be mercury and
+description and we're going to set a
+description which isn't there at the
+moment so
+we'll set this for
+um a wonderful place
+and then when we actually go ahead and
+make that put request
+we should see the response come back and
+so this is a real request that's gone
+through to our api and we've got a real
+response so it's updated it there in the
+database and we can see the updated
+outfield will have changed and the
+description which we've sent through has
+changed and updated our record so let's
+save these these requests
+and we can close a few of these
+and actually we've got the valid one
+we've got the planet does not exist we
+also should have one here for the
+invalid planet id
+so let's actually go and
+duplicate this one planet does not exist
+and
+we can then
+actually
+close that
+and then we'll rename this copy
+to
+invalid planet id
+and this is where we're passing through
+something that's just junk that isn't a
+number like asdf
+um and we've got that request body which
+is actually valid for this put request
+but it's not going to go through because
+we've got this check here in our url
+where we're checking for it being a
+digit so let's send that through
+and we get that 404 error which where we
+which we'd expect because express can't
+find a route that actually satisfies
+this url
+so we've now got put requests here for
+all those different combinations of
+different scenarios and making requests
+to our put planets route so we'll save
+this one
+and then let's go back
+take a look at what's going on with what
+we've changed so we can run git status
+and then we'll get out all those changes
+and then git commit them
+so add
+put
+planets
+id route
+and then we can push that all up
+now our api can create retrieve and
+update planet records in our database
+that's all for this lesson i'll see you
