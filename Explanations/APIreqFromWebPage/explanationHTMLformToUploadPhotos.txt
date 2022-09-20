@@ -1,0 +1,108 @@
+in this lesson we're going to create a
+web page that contains an html form
+this is the form that we'll use to
+upload photos of our planets
+let's create a new web page
+and we'll call it upload.html
+and inside of that we'll create
+our html tags
+and we'll then add in our body tags
+and now we're going to actually add a
+form to our web page so
+every form should have an action and
+this is where we're going to be sending
+the form data to so
+we'll put in our api and we're going to
+specify
+a new
+route that we haven't yet created
+so this form will send
+the contents of this form
+will be submitted to our api to this
+planet and then a planner id and then
+photo
+and now we're going to actually specify
+the method
+for this form is post so this will be a
+post request that the browser makes when
+we submit this form
+and now we need to set the encoding type
+and this is the content type effectively
+of the request that's going to be made
+and this is because we are sending
+through
+a form
+that contains a file
+and so when a form contains file data
+this is the content type that we need to
+use so this multi-part form data
+and now inside of our form we're going
+to add an input of type equals file
+and this then
+we'll give it a name
+and we'll call it photo
+and then we also want to add a button so
+that we can submit this form so we'll
+add an input with type
+submit
+so this is a complete form that has a
+file input and has a button for
+submitting and when this form is
+submitted it will send the contents of
+this form to this url here on our api
+using the post http method
+and so we can save that and let's make
+sure we've actually got a valid id here
+so we'll open up our terminal
+and then we'll npm run dev
+and then over in our browser let's open
+up localhost
+port 3000
+planets
+and then we can see what planets we've
+got on our database right now so we've
+got
+planet
+3 is mercury so we'll grab the id
+and we'll use that here in our url
+and so we've got that ready to go and
+now we're going to actually
+just go and run
+mpm run web in a new terminal here
+and then serve up our web pages so now
+if we control click to open that in our
+browser we can see we've got this upload
+page
+and that's here with that file input so
+this is the file input that we created
+here photo file input and then that
+submit button so that's what's showing
+here on the page
+so we're going to say browse
+and
+then we can go and upload a test file so
+we can
+for example go and add this picture here
+and submit that
+but now we get this response cannot post
+to planets three photos so that url
+doesn't exist our api doesn't have that
+root at the moment
+so we will need to be creating that api
+route in the next lesson
+let's go ahead and commit the web page
+that we've created we can close a couple
+of things here
+and stop our server
+running
+so we'll run git status and
+then get out all of that
+and then git commit
+add
+webpage to upload
+planet photo
+and then we can push that all up to
+github
+we've just created a webpage with an
+html form that's ready for us to upload
+planet photos 
