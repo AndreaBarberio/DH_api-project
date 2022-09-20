@@ -1,0 +1,413 @@
+whole new describe block
+and
+this route is going to be under
+planets
+and then it will be a planet id and then
+photo
+and
+we'll pass in the
+callback function which wraps this
+and this is the url that we've got in
+our html form here in upload.html
+so we've got this path of that structure
+which is like planets id and then the
+photo
+so planets id photo this is the new
+route that we're creating in our api
+we're going to add a test and the first
+test will be for an invalid planet id
+so these are the kind of tests we've
+created previously in our api to make
+sure that we're success correctly
+handling when there's an invalid planet
+id pass through
+so let's create an async function for
+that and
+inside of that test we're going to then
+use supertest to make a request so we'll
+say response equals await request
+and we're going to then post to
+uh that new route that we're going to be
+creating so in this case this is a
+completely invalid planet id it should
+be a number and then we'll say
+asdf to photo and then we're going to
+expect this to be a 404 response
+and we expect the content type
+to be text html so this should end up
+being a response from the express
+default error handler
+and we'll make sure we get that pattern
+in there correctly
+and
+then we want to also actually check the
+response body so
+it's the response.text because it's an
+html response and we're going to expect
+it to contain
+uh
+a message saying that you cannot post to
+slash planets
+slash asdf
+photo so that's that route that we're
+posting to here so we're going to make
+sure that when we create our route for
+our api this planet's id photo root that
+we actually have that validation in the
+express root in the params so that we're
+actually checking that this is a number
+so that we can avoid incorrect
+submissions with completely
+invalid planet ids so then we're going
+to add another test and this will be for
+an invalid request
+with no file upload
+so this is the case where we've got no
+file upload being submitted
+and
+this is
+to make sure that we can actually handle
+if a post doesn't have a file and
+because this route is only going to
+handle file uploads it's not going to
+handle any other data
+so let's copy actually what we've got
+above here and we can paste that in
+and then we can go and tweak it a bit so
+we're going to use a valid planet id so
+that's a number which is valid and we're
+going to expect a 400 response now 400
+is a client error
+and this indicates the client that the
+request they sent was incorrect
+so in this case because they'll have
+actually submitted a request with no
+photo
+that's the reason that the client has
+has incorrectly formed their request
+so here we're going to actually check
+for a different message and this will be
+a specific one that we send back and
+we'll say no photo file uploaded to make
+it really clear to the client what
+they've done wrong in in making that
+request
+so let's save those tests
+and
+we'll see that one of them is failing
+right now and that's the invalid request
+there's no file upload that's because
+that route hasn't been created yet and
+we don't have any error handling there
+whereas we the other one is passing it's
+a 404 and that's because there there's
+just simply no root
+that that's defined in our api so let's
+go ahead and actually create this new
+post planets photo route
+and we'll open up app.ts
+and in here we're going to
+head down to the bottom and create this
+new route
+so we can actually use the pattern that
+we've got here
+so we'll copy that app.delete line
+just to give us a head start
+and
+we'll close that
+function there and this is going to be
+app.post
+and then we're going to keep this
+pattern here and that's what we'll
+actually make sure that any invalid
+planet ids that come through
+uh
+are not handled by this route so that
+they only accept things that have
+numbers then we're going to have slash
+photo
+and then we will inside of here we're
+going to look at the function that we
+want to install so right now we're not
+doing anything here
+and so we want to make sure we've got a
+package that can handle file uploads so
+we're going to install the motor package
+and
+here is the motor package and it's a
+node.js middleware for express to allow
+us to handle multi-part form data
+and if you remember here in the form
+we've got this multi-part form data and
+that's the special content type that's
+used when a request a post request
+contains form data that has a file in
+and so we're going to install malta and
+this is what we'll use in our api to
+handle file uploads
+so let's go ahead and stop our tests
+and then we're going to npm install
+and we'll install malta
+and then we're going to install as a dev
+dependency the types for malta
+types malta
+and install those
+and now that we've got those installed
+we can actually go ahead and look at
+using them so
+we need to create a new file so we're
+going to create a new directory under
+lib and we'll call this middleware
+and inside of that we're going to create
+multi.ts
+and this multi.ts file
+is where we'll actually be working with
+the multi-middleware so we'll import
+motor
+from the motor package
+and then we're going to
+export some options
+so these are options that we'll use
+later on to configure the
+multi-middleware for now we'll just have
+an empty options object and we're also
+going to
+export of our own function init molten
+middleware
+and this function
+is going to
+return
+a new
+multi-middleware instance which is
+configured with our options
+so when we call this init middleware
+from in in it multi-middleware function
+it will return a new motor instance
+which is configured with those motor
+options right now they're empty but
+we'll be adding some in later so
+over in app.ts we've actually got a bit
+of an error here so
+we're going to this is just because
+we've got an empty body in our request
+so this is actually a linting error so
+if we mouse over it's just empty right
+now so it's not actually a problem with
+the code we'll be adding something in
+there later so right now we're going to
+actually look at using the molten
+middleware and so if we head up to the
+top here
+and we can then go ahead and import that
+middleware
+and we'll so
+import in it molten middleware
+from
+and then it's going to be from lib
+middleware
+slash motor
+and then we're actually going to
+call that function
+and we'll assign the response from that
+function or the return value to init
+motor
+middleware
+so that we can then actually go ahead
+and call that so this is that in a
+multi-middleware function here which
+creates that new motor instance we're
+then calling it here after we've
+imported it and then the return value
+from that which is actually a function
+will be assigned to that upload
+variable
+now we're going to go down here and on
+our motor route or on the route here
+we're going to actually look at using
+motor so
+we will split things out a bit because
+this is going to be a longer route
+and
+we're going to
+have multiple
+route handlers so the first route
+handler is going to be using that upload
+motor instance so we say upload.single
+because this is a single file upload
+we're going to handle and then photo
+and that photo that name there is what
+corresponds with the upload
+field that we've got here so this file
+field photo is that corresponding name
+so these must match
+for our multi-middleware to be able to
+handle that file upload
+and then inside of our
+handler here so once it's actually multi
+will handle the file upload and then
+afterwards this root handler will get
+called and because we don't quite know
+what's going on with motor at the moment
+and how file uploads look we're going to
+add a little bit of debug just to make
+it a little bit easier to see what we're
+doing so we'll say
+request.file
+and then we'll actually just log out
+request.file
+and motor automatically adds this file
+property onto the request object when
+it's handled a file upload so this will
+help us to see what's happening so we
+can say if not request dot file
+so if a file upload
+doesn't exist on the request then we're
+going to return
+response.status400 and that's that
+client error that we added in our test
+over here so we've got some explicit
+handling then if there's no file upload
+and so we'll head back into app.ts
+and we'll also send back that message
+and that message is going to be this one
+that we have here in our test so let's
+copy no photo file uploaded
+and we'll paste that in too it's
+important to make sure we return before
+the next function so the following code
+doesn't get executed
+so if there's no file we'll
+push things over to the express default
+error handler with the 400 status in
+that message otherwise we're going to
+actually do things with the file that's
+been uploaded so we'll say photo file
+name and this is request
+dot file
+dot file name and because we've
+installed those multi types
+we can actually see that this is a
+property is available on that file
+object
+so dot file name and then we can say
+response.status 201 so that means
+created we've created it something new a
+new resource from what's been uploaded
+and then we'll say we'll send back a
+json object that contains that photo
+file name
+and
+now that we've done that let's start up
+our tests again
+and we can see what's happening with
+those
+and we'll run them in watch mode
+just in case there's something to fix
+and or a to run them all again
+and we can see that now that invalid
+planet id test is passing because we've
+got that validation here for the id so
+that it's a number and also the invalid
+request with no file upload is also
+passing because this request we're
+making here doesn't actually contain any
+file upload
+so everything is good with our tests and
+now we're going to actually open up
+the web page that we've created this
+upload web page and look at uploading
+things
+and see how our api route is handling
+this file upload
+so let's just stop this running here and
+we're going to serve the web directory
+with npm run web
+and
+then we'll also
+want to
+start up our api with npm run dev and a
+separate tab here
+and we can
+click through here to load up the web
+page in our browser
+so then we've got this upload webpage
+so if we actually go and try and upload
+an image
+and we'll upload another space image
+let's actually first open up the
+inspector so we'll ins right click and
+inspect that's how we can open up the
+developer tools inspector panel and then
+we'll make a request so we're going to
+move to the network tab so we can see
+that so now we've added selected that
+file we'll submit it
+and then we'll see what comes back
+so this actually doesn't look like
+there's any response body
+we can see we've got that 201 created
+http status and that's the one that
+we're sending here
+in our
+response handler and our root handler so
+we're sending that back but there's no
+json object the file name is actually
+empty
+and
+that's because by default malta the
+multi-middleware doesn't actually save
+uploaded files somewhere we need to
+actually configure it to do that and we
+can see here that we've got a bit of
+information about what's come through so
+we can see the original file name so
+this is that debug logging that we've
+added here with console log so we can
+see the fill name as photo the original
+file name we can see that it's the mime
+type which is the content type for that
+image is image jpeg so there's a jpeg
+image and then there's all this binary
+data and then the actual file size so
+we'll look at configuring multi a little
+bit later let's go ahead and commit
+everything that we've done so far so
+we've actually gone and installed the
+motor middleware added that created a
+new multi instance
+and then we have
+brought it in here
+and then created that new instance
+and then we use it on our brand new
+photos upload route and this is a post
+route and it's got the specific planet
+id then we've used that multi-middleware
+to handle our photo
+upload field
+which contains a file and then we're
+logging it out we've got some error
+handling if a file is missing
+and then we are actually handling
+getting the file name and sending it
+back but right now the file name's not
+working we'll fix that later on so let's
+stop things running
+and
+we can then
+stop this running as well take a look at
+all the changes we've made
+and then we can get add everything
+and then we can git commit
+add
+and this is the
+post slash planets
+id
+photo root
+and we can commit that
+and then push it all up to github
+we've just integrated the molten
+middleware into our api to handle file
+uploads
+soon we'll look at how we can configure
+it to actually save files when they're
+uploaded
