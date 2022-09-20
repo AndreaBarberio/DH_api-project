@@ -1,0 +1,316 @@
+we're also going to configure our api to
+send special course headers so that http
+request on the web page works correctly
+let's create a web page that makes an
+http request to our api
+we can create a new directory
+and we'll call this web
+and inside of that we're going to create
+a new file called listing.html
+and we'll start creating an html
+document so we'll add a doctype html tag
+and then we'll make sure we close those
+html tags and then inside of that we're
+going to have our body
+and we're going to add in a script tag
+and inside of this script tag we're
+going to add some javascript which is
+going to make our http request so we'll
+create an async function
+fetch planets
+and inside of that we're going to make a
+request using the browser fetch api
+so we'll now be making requests to our
+api
+which is going to be listening at port
+3000
+and then we're going to make a request
+to that planet's endpoint where we can
+get back all the planets that are in our
+database
+so then we'll say
+add another variable called planets and
+that's going to be
+the json response body the past json
+response body from the response that
+comes back from our api
+and then we can actually just log it out
+to the console
+so we'll log out planets
+and then we're going to actually make
+sure we call this function so we'll call
+fetch planets
+so this is a complete web page now that
+we can actually go and run in our
+browser and it's going to call the fetch
+planet's function and the fetch planets
+function makes a call to our api gets
+back that planet's data and logs it out
+now in order to actually test it and
+load it up we need to actually serve up
+this page so we're going to use the
+package serve
+and this allows us to actually
+serve up a static site locally so we can
+easily then go and access it in our
+browser
+so let's install serv as a dev
+dependency we'll open up a new terminal
+and we'll save it here
+with
+serve
+so add it as a dev dependency
+and then once that's installed we're
+going to actually for a convenience for
+the future we're going to add a run
+script here
+and this run script is
+going to be called web
+and we'll use that serv command line
+interface which we've just installed
+we'll tell it to listen on port 8080 and
+it's going to serve up that web
+directory that we've just created so we
+can save that
+and let's go ahead and look at the
+changes we've made
+and we can add all of those and we'll
+commit them
+so
+add
+a listings
+a listing web page
+and then we can commit that and push it
+all up
+and now we can actually go ahead and run
+that run script so npm run web
+and that's showing us where it's now
+serving so it's on our local network and
+we can actually
+click on that url control click and it
+opens up in our browser so we can now
+actually go and load up this page
+so now we're looking at the listing page
+that we've created there's nothing
+showing on the page because
+if you remember here in our script
+or in our html we've only got a script
+here
+and there's no actual content on the
+page
+so if we head back and open up the
+developer tools so we'll head to more
+tools
+and then
+into our developer tools
+and then if we go and take a look at the
+console we'll see that there's actually
+an error message here and this is a
+cross origin error
+and this is because
+there is an issue with how things are
+set up at the moment with our api and
+this web page isn't able to access it
+now cause
+stands for cross-origin resource sharing
+and it's a security feature that's built
+into web browsers
+this is to
+enable us to actually control from our
+api what web pages can actually load up
+the content from our api and work with
+it and so to actually for our api to
+actually be able to be have a request
+made to it from our web page we must
+explicitly allow cause this cross-origin
+resource sharing and we can do this by
+sending cause response headers
+we're going to install the cause package
+this is a middleware package for express
+and this will help us actually send back
+the correct headers
+so let's go ahead and install cores we
+can actually open a new terminal here
+and then we'll npm install
+pause
+and add that as a regular dependency and
+then we're going to install the types
+for calls as well
+and we'll save those as a deb dependency
+so that's types
+cause
+so now that we've saved those we can go
+ahead and open up our app.ts
+and we're going to import it here so
+we'll import it up at the top
+we'll import
+cause
+from cause
+that's from the course package that
+we've just installed and then before any
+of our routes after that express.json
+middleware's added we're going to add
+the
+cause middleware
+and we do it with by saying cause and
+then calling it because it's actually a
+function and so then we can save that
+and if we head back and go and refresh
+things in our browser we'll keep an eye
+on what's happening with our request
+here
+we'll see that we've actually got
+another course error and that's because
+we actually need to
+get our server up and running so we'll
+run npm run dev
+to start our api
+and then head back and give it another
+refresh
+and now we can see that actually we're
+getting our planet's data coming back
+and they're all being logged out
+so that requests that http request made
+with the fetch api
+from the script
+here in our page and our web page is
+actually working because we've gone and
+added these course headers onto our api
+by adding the cause middleware to our
+express api
+now if we actually go and take a look at
+the request that was made
+we can see that this is the cause header
+that was sent back access control allow
+origin and so when the request was made
+we can see that the origin is localhost
+8080 and that's what we're seeing here
+in our browser so the origin is the web
+page that we're sending this from
+it's a combination of the protocol
+of the
+of the host like the domain name and the
+port so this origin is sent through and
+then our server saying will allow any
+origin with asterisks so this actually
+allows any web page to make a request to
+our api so this isn't an ideal situation
+we we want to restrict things so we're
+going to actually go and add some
+options when we call our cause
+middleware so let's create a new
+variable
+and we'll call this
+cause options
+this is going to be an object and inside
+of that we're going to explicitly set an
+origin and we can head back here and
+then copy this so this is the origin we
+want so we'll copy that from our browser
+and paste that in here so we don't want
+the the header name there so this is the
+only origin we're going to allow to talk
+to our api so if any other web page
+tries to make a request to our api it
+won't work
+and so then we must pass those cause
+options that object we just created into
+the course middleware to configure it
+so now if we save those and our server
+restarts
+we can then refresh the page
+and see what happens so the request
+still succeeds everything goes through
+but if we take a look at the network
+request
+we can see that we've got this access
+control allow origin is now restricted
+explicitly to this origin that we're on
+here this localhost port 8080
+so it means that we've actually tied
+things down so that they're a bit more
+restricted
+and now we need to go and actually add
+some tests for course headers in our api
+tests we want to make sure that we don't
+accidentally remove it in future or
+disable it because it's going to be
+important that our web page can actually
+make requests to the api
+so let's stop our server running
+and then we will also stop
+the web server running and then we're
+going to go and run our tests in watch
+mode so let's
+start them up like this
+we can close a couple of files here
+and then we're going to open up our
+server test files our api integration
+test
+and so we're going to add this extra
+expectation to all of the valid requests
+that we're making so if we head here to
+get planets we've got the valid request
+test and inside of that we're going to
+add in an extra
+expect and we're going to expect this
+access control
+allow origin header
+and that's that course header that's
+getting sent back by our api
+to enable our web page to be able to
+make http requests to it
+so we're expecting the access control
+our origin header to equal the origin
+that we've set here
+for the cause middleware
+and so then we can copy that well let's
+first actually save it and see our test
+run
+and so that's passing that's great so
+that's that test we just added that
+expectation is working so we'll copy
+that and then we'll head down to
+post planets to this valid request here
+and we're going to add it in there we'll
+just paste that in
+and then we'll head down to put planets
+and do the same
+for the valid request there
+and then we'll keep saving as we go so
+we'll make sure we're not breaking any
+of our tests
+and then we'll go to
+the delete planet
+and add it in here
+and
+that's all of them so now we've got our
+all of our valid request tests are
+expecting there to be an access control
+allow origin
+header coming back in the response so
+this makes sure that we've got our cause
+middleware correctly configured and if
+we make any changes it means that we can
+catch them and not potentially introduce
+any accidental bugs so let's stop our
+test running
+and
+run git status we can add all of those
+changes we've just made where we've
+added that coors middleware in
+and we've got those tests for them as
+well so we can git commit
+add
+support
+for
+cores
+to the api
+and then we can push those changes up
+in this lesson we've learned how to
+create a web page that makes an http
+request to our api we've seen the
+importance of enabling calls so those
+requests work and also being able to
+restrict them so that only our own web
+pages can access our api
