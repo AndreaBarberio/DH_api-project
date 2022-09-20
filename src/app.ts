@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors";
 import { nextTick } from "process";
 import prisma from "./lib/prisma/client";
+import cors from "cors";
 
 import {
     validate,
@@ -10,9 +11,15 @@ import {
     PlanetData,
 } from "./lib/validation";
 
+const corsOption = {
+    origin: "http://localhost:8080",
+};
+
 const app = express();
 
 app.use(express.json());
+
+app.use(cors(corsOption));
 
 app.get("/planets", async (request, response, next) => {
     const planets = await prisma.planet.findMany();
@@ -66,23 +73,20 @@ app.put(
     }
 );
 
+app.delete("/planets/:id(\\d+)", async (request, response, next) => {
+    const planetId = Number(request.params.id);
 
-app.delete(
-    "/planets/:id(\\d+)", async (request, response, next) => {
-        const planetId = Number(request.params.id);
+    try {
+        await prisma.planet.delete({
+            where: { id: planetId },
+        });
 
-        try {
-             await prisma.planet.delete({
-                where: { id: planetId }
-            });
-
-            response.status(204).end();
-        } catch (error) {
-            response.status(404);
-            next(`Cannot DELETE /planets/${planetId}`);
-        }
+        response.status(204).end();
+    } catch (error) {
+        response.status(404);
+        next(`Cannot DELETE /planets/${planetId}`);
     }
-);
+});
 
 app.use(validationErrorMiddleware);
 // Request examples
