@@ -44,7 +44,10 @@ app.get("/planets/:id(\\d+)", async (request, response, next) => {
     response.json(planet);
 });
 
-app.post("/planets", validate({ body: planetSchema }), async (request, response) => {
+app.post(
+    "/planets",
+    validate({ body: planetSchema }),
+    async (request, response) => {
         const planetData: PlanetData = request.body;
         const planet = await prisma.planet.create({
             data: planetData,
@@ -53,7 +56,10 @@ app.post("/planets", validate({ body: planetSchema }), async (request, response)
     }
 );
 
-app.put("/planets/:id(\\d+)", validate({ body: planetSchema }), async (request, response, next) => {
+app.put(
+    "/planets/:id(\\d+)",
+    validate({ body: planetSchema }),
+    async (request, response, next) => {
         const planetId = Number(request.params.id);
         const planetData: PlanetData = request.body;
 
@@ -77,7 +83,7 @@ app.delete("/planets/:id(\\d+)", async (request, response, next) => {
     try {
         await prisma.planet.delete({
             where: { id: planetId },
-        }); 
+        });
         response.status(204).end();
     } catch (error) {
         response.status(404);
@@ -85,41 +91,35 @@ app.delete("/planets/:id(\\d+)", async (request, response, next) => {
     }
 });
 
-app.post("/planets/:id(\\d+)/photo",
-    upload.single("photo"), async (request, response, next) => {
-        console.log("request file", request.file)
+app.post(
+    "/planets/:id(\\d+)/photo",
+    upload.single("photo"),
+    async (request, response, next) => {
+        console.log("request file", request.file);
 
         if (!request.file) {
             response.status(400);
             return next("No photo file uploaded.");
         }
 
+        const planetId = Number(request.params.id);
         const photoFilename = request.file.filename;
-
-        response.status(201).json({ photoFilename });
+        try {
+            await prisma.planet.update({
+                where: { id: planetId },
+                data: { photoFilename },
+            });
+            response.status(201).json({ photoFilename });
+        } catch (error) {
+            response.status(404);
+            next(`Cannot POST /planets/${planetId}/photo`);
+        }
     }
 );
 
+app.use("/planets/photos", express.static("uploads"));
+
 app.use(validationErrorMiddleware);
-// Request examples
-
-// !GET /planets  - retrieve all the planets
-// app.get("/planets", (request, response) => {});
-
-// !GET /planets/:id   -retrieve a specific planet
-// app.get("/planet/:id", (request, response) => {});
-
-// !POST /planets   -Create a new planet
-// app.post("/planets", (request, response) => {});
-
-// !PUT /planets/:id   -Replace an existing planet
-// app.put("/planets/:id", (request, response) => {});
-
-// !DELETE /planets/:id    - Delete an existing planet
-// app.delete("/planets/:id", (request, response) =>{});
-
-// !POST /planets/:id/photo - Add a photo for a planet
-// app.post("/planets/:id/photo", (request, response)=>{})
 
 export default app;
 

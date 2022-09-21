@@ -1,0 +1,371 @@
+in this lesson we're going to update the
+photo upload api route we're going to
+change it so that it saves the photo
+file name to the planet database record
+at the moment our photo upload route
+accepts a file
+which is handled with motor and then
+that gets saved to disk we've configured
+that here in the multi-middleware so
+that it's using the disk storage
+and it's saving it there with the file
+name generated in the way that we want
+with that random file name and the file
+extension
+but we're uploading photos for a planet
+for a specific planet id and we're not
+saving those photo file names into the
+database for our planets
+so let's update that and we're going to
+open up our prisma directory which is
+over here the main one in the route so
+we've got this prisma one under src we
+want the prisma one here and the root
+which is
+contains schema dot prisma
+and we're going to now go and add a new
+field photo file name we'll add it in
+after moons
+and we're going to say photo file name
+this is going to be a string and it's
+going to be optional because not all
+planets will have a photo file name
+and we're going to say
+at db.varchar255
+so 255 means the maximum length of this
+photo filename string is 255 characters
+so we've added this to our model for the
+planet and that means that we now need
+to go and save that and then create a
+migration so we'll use the prismacli mpx
+prisma and then we're going to use the
+migrate command and it's dev which is
+our current environment development
+and then we're going to give this
+migration a name
+photo
+and then when we run that command
+prismo will connect to our database and
+it's now gone and updated the underlying
+planet table in our database to add that
+photo file name field so everything's
+now in sync and it's also going to
+regenerate it the types
+for our prisma client so that when we're
+working
+with our prisma client in our code it
+will know that that photo file name
+field is there it'll be available in the
+types
+so let's take a look and we can see in
+the migrations directory this new photo
+directory
+and this is the sql that it actually has
+run against our database to go and add
+in that photo filename column
+so now that that's been added we can
+actually go ahead and look at actually
+making changes to how we save it but
+first let's run our api and see what
+effect that's having on the responses
+so if we do npm run dev to run our api
+and then over here on the right hand
+side
+we can split and then make a call
+request and we're going to make a
+request to the planet's route
+and then we'll put in a planet id so
+let's have a look and see if we've got
+planet one in the database
+so now when we make a request to planet
+one what we can see is we've got this
+photo file name field and that's coming
+back that's a photo file name field
+that's now in our database but it's null
+because it's an optional field if it
+doesn't have a string value then it's
+going to be null
+so we actually need to go and update
+our root handler to be able to
+add those photo file name values when we
+upload a file
+so let's exit this particular terminal
+we'll stop this running and then we're
+going to go and run our tests in watch
+mode and we'll add a test
+so that we can get some handling into
+our
+this is into our app route here where
+we've got the photo upload we're going
+to be making some calls to prisma using
+the prismaclient to save that photo file
+name so the test we're going to create
+here
+is if a planet doesn't exist so we'll
+this is basically some error handling
+we're going to put in place here
+so we'll say test
+planet does not exist
+and then we'll create this test block
+and we'll make sure we make it async
+because we're going to be
+using the keyword or weight inside of
+here and now we're going to add in
+we need to put in a ts ignore because
+we're going to use that prisma mock
+and
+we do prismamoc.planet.update
+dot mock rejected value
+now we wouldn't normally use ts ignore
+but there are issues known issues with
+the prisma mock value types and we're
+going to say that when we call update
+when a planet does not exist in our root
+handler it should actually
+reject with an error and we'll just
+have this new error here
+and then we're now going to actually use
+supertests request to actually make a
+request so we'll say post planets
+23 photo
+and then we're going to attach an upload
+so we can copy this from the test above
+our valid request so we'll attach a
+natural file upload so this is a valid
+request so it's got a correct request
+body with a photo file upload it will
+just be that this id doesn't exist in
+our database so when we try and make an
+update to that record we'll get an error
+so we're going to expect a 404 from that
+route
+and we're going to expect the content
+type
+to be text html as this will be coming
+through from
+the default express error handler
+and so once we've done that we're going
+to say we expect the response.txt
+because this is an html response
+we're going to expect it to contain
+this error message and it'll be that you
+cannot post to planets
+23
+photo
+and if we actually
+go ahead and save that
+we'll see that it's failing because we
+haven't actually got that error handling
+in there and right now our roots doesn't
+doesn't care if you actually
+pass through a file upload and that
+planet id doesn't exist we're not doing
+anything with that id we're not actually
+using it anyway so let's actually update
+this to go and save things into our
+database
+so we're going to say here we're going
+to actually
+do const
+planet id
+equals
+number
+and then we'll say request.params.id
+so we're grabbing that parameter that we
+have here that id parameter
+which expresses checking as a number so
+we'll only allow numbers through
+and we're getting that as our planet id
+so the param id is here and now we can
+go below here and we can say
+we're going to wrap our call to prisma
+in a try catch block and we'll make sure
+we catch any errors that come out to
+this
+and so inside of that we're going to say
+await prisma
+dot planet so that's our planet model
+dot update
+and then inside of that we're going to
+pass through an options object and
+that's going to have a where property
+which has an object with an id and we'll
+pass through our planet id so we're
+going to be updating the planet where
+the id
+is that planet id that's come through in
+our request url
+and we're going to update it with some
+data and that data is going to be that
+photo file name that we've got there
+above
+so we're going to be updating the photo
+file name field and so that's here
+and
+we can actually then
+save that
+and
+we can then go and add a response.status
+and add a 404
+and then we're going to actually call
+the error handler by passing through an
+error message i'll say cannot post
+planets
+and then we'll put the planet id
+and then slash
+photo
+and that that's going to happen when we
+actually
+if there an error comes back from the
+prisma
+api or from the prisma called to the
+database so if it cannot find a planet
+with this id it's going to throw an
+error and we're going to catch that in
+this block here we'll send set the
+status to 404 because we couldn't find
+that planet in our database and send
+back that error message with the express
+default error handler now if we save
+that we'll see that we've got this type
+error here and it's saying about photo
+file name is not available in the types
+that prisma has
+so if we actually restart the typescript
+server control shift p
+and then restart
+ts server
+it should then restart things so this is
+just helping the typescript server pick
+up those updated types because every
+time we create a new migration it
+updates the types for the for our prisma
+models those aren't always automatically
+picked up by the typescript compiler in
+vs code or by the typescript server so
+we just need to sometimes restart it so
+that's now fixed that type error and
+everything's set up here to save things
+to our database
+and we need to pull this line here
+where we're responding we can stop our
+tests
+and now we're going to start up our web
+server and actually test uploading a
+file
+through our upload form so we've started
+that up and then we're going to start up
+our api with npm run dev
+and now if we head back into our browser
+and go back and then we can refresh this
+page
+and if we actually just check our
+upload.html we'll see that we're going
+to be uploading a planet photo for
+planet three
+and so back in the browser if we now
+select a file and we'll select this png
+here of a planet
+and then we can upload that and we'll
+see now that we've got this photo file
+name come back because
+photo
+has been uploaded and has been saved for
+planet three
+now if we want to confirm this we can go
+and take a look here we can see our
+uploads directory
+and we've got this new file that's been
+uploaded of the planet and that's got
+the correct png file extension
+and if we then want to actually take a
+look in the database we can go and see
+where that value is so if we actually
+open it up here we can go to
+localhost planet 3 so this will be
+localhost port 3000
+planets
+3
+and then we can see that that mercury
+planet has that photo filename
+which is ending in 429.png
+which matches up with what we have here
+on our file system
+and so now planet 3 mercury has that
+photo file name referenced and it's
+actually available and we now know that
+that photo is linked to that particular
+planet
+now let's make it possible to view these
+images in the browser so right now we've
+got these images here in our uploads
+directory but there's no way of going
+and viewing them
+so we can do that in our app.ts by using
+some built-in middleware that comes with
+express it's the static middleware so
+we're going to add this in here we make
+sure we add it before our error handling
+middleware so
+after all these other routes we're going
+to say app.use
+and then we say slash planets slash
+photos
+so any request to slash planet photos
+we'll use this express static middleware
+and we're going to under that particular
+route planet's photos we're going to
+serve up our uploads directory where
+we've got all of those images
+and so we can then actually save that
+and our server restarts
+and then if we head here to the browser
+we can see we've got that photo file
+name so if we now copy that photo file
+name
+and the route we're going to be loading
+is slash planet photos
+so it's localhost port 3000
+planets
+photos and then slash and then we paste
+in that file name for that planet photo
+press enter and we've now got that photo
+that we've uploaded for our planet
+showing here in the browser
+so let's head back to vs code and we'll
+stop our server running
+and then stop our web server running run
+git status
+and we can see all the changes we've
+made that prisma migration the prisma
+schema change where we've added in that
+photo file name field which is optional
+we've now got our photo file upload
+route actually handling the photo file
+name and saving it into the database
+when a photo is uploaded and then that
+means we have that in our responses when
+we're calling our api so that we know
+which image exists for which planet
+so let's go ahead and get at all of
+those changes
+we'll get
+commit
+and
+we'll
+update
+planet
+record
+with
+photo file name
+and we can then go and push those
+changes up
+to get home
+so we've now configured our route to
+actually save the photo file name to the
+planet database record so they've got
+that association and we can actually
+then retrieve those photos in future
+we're also serving up those uploaded
+photo files in our browser so that we
+can view them alongside the planet data
