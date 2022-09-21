@@ -1,0 +1,318 @@
+in this lesson we're going to configure
+the molten middleware to limit the
+maximum file size and the file types
+that it will accept
+here in our molten module we have multi
+options at the moment we're not setting
+any options but now we're going to tell
+malta about a maximum file size limit so
+we don't want our api to take huge
+images that are too large and so we're
+going to actually limit the size of them
+so we're going to define a variable
+this is a constant maximum size
+in megabytes
+now
+the actual size is going to be in bytes
+and bytes is the smallest size that we
+can have so
+a byte
+is
+the smallest and but we want to have
+megabytes so
+a megabyte it we're going to say six
+megabytes and a megabyte contains
+1024 kilobytes and each kilobyte
+contains
+1024 bytes and that's how file sizes are
+defined on computers
+and this is relating to the actual
+storage on the physical disks in our
+computers
+so we're going to this is saying we want
+to allow a maximum size in megabytes of
+six megabytes
+and so now we're going to use that
+here in the motor options we're going to
+pass through a limits object so that's
+an option that motor allows we'll say
+limits
+file size and then we're going to use
+that max size in megabytes variable that
+we just
+defined there so we're not going to
+actually add an api test for this
+particular option because malta
+middleware itself has tests it tests the
+maximum file size in their own tests so
+we're going to trust that that test is
+handling that correctly but we've now
+limited it so we cannot upload really
+large file uploads
+and so now we're also going to add
+an another restriction here and so we're
+going to restrict the file uploads to
+pngs and jpegs so at the moment we can
+accept any file through so let's head
+over to our tests
+and we're going to add a new test in
+here
+we'll open up the terminal as well
+and in the terminal we'll start our
+tests in watch mode
+so the test we're going to add is we're
+going to
+copy this valid request for the png file
+upload and we're going to add another
+test which is we'll paste that in and
+it's going to be for jpeg so we'll say
+with the jpeg file upload and in our
+test fixtures directory we've got that
+file.jpg
+that's the one we're going to be using
+here
+file.jpg and we're going to then
+save that
+and
+we should see that that pass is fine and
+that test passes because at the moment
+any file type is allowed through our api
+upload route
+now let's go and add a test where we're
+uploading an invalid file so we'll copy
+this test
+and we'll paste it in and we'll say
+invalid request
+with a text file upload
+and that's going to be
+using this test file.txt fixture file
+that we have which is not an image
+so here instead of file.jpg we're going
+to say file.txt
+we're going to expect a 500 response so
+this is going to be an error that should
+be thrown by malta when the mime type is
+not correct
+for the actual file and then we're going
+to
+say that we expect the content type
+to be text html because it's going to be
+sent back by express's default error
+handler
+and so
+now that we've got that working
+we're going to go and add another
+expectation and that expectation is on
+the response.txt because this is an html
+response that will come back
+and this error response should contain
+an error saying that the
+uploaded
+the uploaded file must be
+a jpeg or a png
+or a png image so we can save that
+and we actually need to
+have a const response here so we
+actually are saving that response into a
+variable so we can expect it here
+and so now we've got that let's save
+that test for this invalid request and
+that test is failing because at the
+moment we're actually allowing that so
+it's got a 201 created back because
+again our route is still allowing any
+kind of file upload
+in malta we can actually tell it to
+limit what's coming through
+and so we can do that by restricting the
+type of files that can be uploaded we're
+going to add a file filter
+so
+here after we've got maximum size in
+megabytes we're going to actually create
+a new function and inside of that we'll
+be filtering and checking the mime type
+of the files are uploaded so we'll say
+cons file filter equals request
+and
+file
+callback
+and so this is a function that we'll be
+passing into malta for it to validate
+things so we need to add a type on to
+this
+and we're going to use
+malta
+dot options
+the capital o there and then it's the
+file filter
+so that's the type of that we have for
+this callback function
+and then we're going to be actually in
+here we're going to check against a
+valid array of mind types so let's
+define
+const
+valid mime types
+and this array is going to contain the
+mime types for the file that we want to
+accept
+so these are mime types that we've seen
+before when we were creating our tests
+here in malta.test.ts
+because png files have the image png
+mine type and jpeg files have the image
+jpeg type
+we can't necessarily trust the file
+extension that comes through so we
+actually need to check what's embedded
+in the file that mime type so we're
+checking we'll be checking here for the
+valid mime type so we're going to say if
+valid mime types
+dot includes
+file.mime type
+and so that's that mime type value that
+multi gives us in that file object and
+so we're going to say if this array of
+valid mime types contains this
+mime type that's come through in the
+file that's been uploaded then we're
+going to call this callback function
+that motor has passed us
+we'll call that we'll pass through null
+because there's no error and then we say
+true and that means that this is a valid
+file and we want to allow it to be saved
+else
+if that's we couldn't find that
+particular mime type in our valid mime
+types array
+then we're going to
+call back and then we'll pass through an
+error
+and that error message we're going to
+pass through we'll copy over from our
+test so it's this error here
+where the uploaded file must be a jpeg
+or a png image so let's copy that paste
+it here
+into our function
+and now to actually use this
+file filter function that we've just
+created we're going to go and add it
+down here into our motor options so
+we'll add it here at the top file filter
+and now that's going to get passed
+through whenever we create a new motor
+instance it will be telling it that we
+want to
+actually check the file so when it's had
+an upload come through it will be
+calling this function we'll be checking
+the mime type making sure it's an image
+or
+of a type of a png or a jpeg
+and we'll make be making sure that the
+file size is no larger than six
+megabytes
+so now that we've got that
+all in there let's save this file
+and we can see that our tests are all
+passing
+and if we head back to our app.ts we've
+got this console.log here which we added
+in to just help us see what was
+happening with the file uploads we've
+been building it
+but now we're pretty much complete with
+things we can see that it's actually
+creating a bit of noise here in our test
+output so let's go and remove that
+console log because we don't want that
+in our production code
+we've just had that for debugging during
+development so now our test output is a
+lot cleaner and it doesn't have all that
+noise coming through
+so we can actually go and test that what
+we've done with this files file changes
+are working we've got our test working
+but now let's start up our web server
+and then let's again split and start up
+our api with npm run dev
+and let's go and upload
+a form
+well upload a file rather here in our
+browser so we can close this one
+we want to go
+back here this is
+localhost 8080 and the slash upload
+and we're going to browse and we can try
+uploading a text file
+and so now if we submit that we should
+see that we get that error coming back
+the uploaded file must be a jpeg or a
+png so we verified that actually that
+special handling we have there with that
+file filter function is doing its job
+and it's found that this file isn't
+valid however if we go back and then we
+upload
+uh file.png
+and submit that it's allowed that
+through because that's got a valid mime
+type
+now there's one last thing we can do to
+help restrict the types of file uploads
+and that's in the html for our form so
+if we open up upload.html
+we can see here we've got our input for
+the file for the photo file and we can
+go and add an extra attribute on the end
+which will restrict the types of files
+that people can browse for
+when they're selecting files so we say
+accept equals
+png file extension
+the png mime type
+a dot jpg or a dot jpeg file extension
+because sometimes they will have one or
+other of those extensions for jpeg files
+and the image jpeg mime type
+so what this means now if we save that
+and then we head back into our browser
+we'll refresh the upload page
+and now when we browse we can no longer
+see that text file we can only see files
+which are jpegs or pngs which are
+matching so we've got that validation on
+the server side and then we're also able
+to actually limit things here
+in the html form in the browser
+so that we can
+restrict what people are uploading and
+also make sure that people don't
+accidentally select the wrong file type
+so let's head back into vs code we can
+stop our server running
+and we can stop our web server running
+and look at our changes and then we can
+get add
+everything
+and we can get commit
+and pick a motor to restrict
+file uploads
+and then we can get push
+we now have a fully functioning photo
+upload route for our api it can take
+planet photos uh jpegs or pngs save them
+to the disk and then also update the
+planet records in our database so they
+have that photo file name and we're able
+to go and view them in our browser we've
+got that checking as well to make sure
+that the file size is not too large
+and we've got everything nicely set up
+with malta so that it's integrated that
+middleware into our route
