@@ -1,0 +1,331 @@
+in this lesson we're going to configure
+the molten middleware to save files with
+file extensions let's take a look again
+at what's happening when we upload a
+file through our web interface so we'll
+run npm run web
+and then we'll split our terminal
+and we'll run
+our api as well with npm run dev
+and we can
+control click
+on this url here for the web server
+and open that up in our browser local
+host port 8080.
+now if we open up our upload web page
+we can then use that form and we can go
+and upload we'll upload this png file
+and we'll upload that to our api so
+we've got this response come back here
+and we've got this photo file name
+now when we actually uploaded the file
+we can see that it had that dot jpeg or
+dot png file extension and we are
+accepting these types of files and we
+can see there we go the file.png is
+there
+and it's an image png mime type but when
+the file is actually saved by malta it's
+just got this file name this randomly
+generated file name with no file
+extension but we want to be saving files
+with file extensions so that we can
+actually view them properly
+so let's close that now
+and we'll stop our server running
+and we're going to actually fix this by
+installing a package which will help us
+be able to actually identify the file
+extension for the files that being
+uploaded and then we can actually save
+them
+with a correct file name so if we
+actually head to our browser we're going
+to use the mime package and the mime
+package allows us to actually look at
+the mime type of the file upload and
+then get the correct file extension
+so in order to use it we're going to npm
+install mime
+and then we're going to run npm install
+again and save the types for mime as a
+dev dependency so that's app types
+slash mime
+and so now we've got that installed
+we're going to go and create a function
+in our multi.ts module and this function
+is going to be for
+generating a photo file name
+and
+this will allow us to actually make sure
+we add on that missing file extension so
+we'll accept a mime type into this
+function that's the mime type for the
+uploaded file
+and when we are actually creating a file
+name we also want to have a random part
+to it like this and that means that if
+lots of people are uploading files and
+potentially they have the same name say
+two people upload something with
+file.jpg we don't want to overwrite the
+existing files so we're actually going
+to then generate a random
+id here so what we need to do is
+import the
+random uid method from
+the node cryptography module so we'll
+import random uuid
+from and this is node crypto so that's
+the cryptography module that's built
+into node.js
+so we'll then use this random uuid
+function we'll call it here to generate
+a random uid that looks a bit like this
+with letters and numbers and then we're
+going to make this a truly random string
+by actually also then adding in
+a call to date.now which will return a
+long number
+and so we'll see in a moment how that
+looks but then we'll also make sure
+we're getting this file extension from
+our files so to do that we're going to
+import that my module that we installed
+so import mime from mime
+and then we're going to call
+mime dot get extension
+and that get extension function we're
+going to pass through that mime type
+so the value of this file extension
+variable will be the mind the the
+extension
+for the corresponds with the mime type
+and we'll see in a moment how that's
+working so we're going to then say const
+file name equals and we'll put those two
+variables together so we'll take that
+random file name
+and then we add a dot
+and then we're going to use that file
+extension that we've extracted with the
+my module
+and then we're going to return the file
+name from the function
+now this function is a discrete unit of
+code this function can be tested with a
+unit test so we're going to create a new
+test file multa.test.ts
+and inside of that we're going to import
+our generate photo file name method so
+let's import it
+generate
+photo file name
+from our motor module
+and then we're going to create a new
+describe block
+and
+we'll be describing
+our function so this is where we're
+going to wrap our tests in here so
+inside this describe block so we'll say
+describe the generate photo file name
+function and then we're going to use
+test.each
+and we'll pass it an array
+and then we're going to actually
+say that we'll
+be adding a test for the generate photo
+file name generates a file name with
+correct
+extension
+when passed
+mime type
+and then we'll see in a moment what this
+special magic
+percentage s is doing
+and so we've got this dot each we'll be
+passing through multiple values so this
+test will get run multiple times for the
+different
+elements in the array
+so what we're going to do is we'll add
+that onto a new line now and then we're
+going to pass through
+two array elements so image slash png
+and so this is for
+a png mime type
+and then we're going to copy that row
+and create something similar but for
+jpeg so that'll be jpeg mime type
+jpg
+or jpeg
+so what's going to happen here then is
+for each of these array elements it will
+run our test now we need to go ahead and
+actually
+uh to specify a test so we're going to
+go and do that now and that test will be
+passed through each time the test
+executes will be passed through the
+elements in each array so
+in this case it's going to be the mime
+type so we're accepting the mime type
+first
+and then it's going to be the expected
+file extension so in this case it'll be
+png
+so this is the expected file extension
+and we're going to accept that here
+now let's
+reformat this file because that's ctrl
+shift p and then we'll format the
+document to make it a little bit more
+readable for us
+and now we can actually see what's going
+on a bit better so now inside of here
+we're going to have our expectations
+so we need to actually call the generate
+photo file name function so we'll say
+full file name and that's what's being
+generated by our generate photo file
+name so it's got a full file name with a
+random part a dot and then the file
+extension
+and we are going to then
+call generate photo file name
+and we're going to pass through the mime
+type for this instance of the test
+and then we're going to actually take
+what comes back from that call to
+generate photo file name and we're just
+going to use the file extension part
+because that's what we really care about
+in this test
+we're actually checking that we're
+getting the correct
+x file extension back so we're splitting
+the file name on dot
+because the file name consists of the
+random file name part and then a dot and
+then the file extension and that's what
+we want to check for here in our test
+so we've used this to get the file
+extension out
+and then we're going to say expect
+file extension
+so that's that part after the dot which
+in this case
+is say if it's running for the png test
+it should be
+equal to
+the
+expected mime type there's expected file
+extension so we say expected file
+extension
+and that should then actually for each
+time we run this it should be passing
+these through
+and so we're going to save that test and
+then we can
+run it by right clicking multi.test.ts
+copying the relative path
+and then here in the terminal running
+npm test space dash dash space
+and then pasting in that test path
+now when we run that test
+we should see that everything's passing
+so that's great we've managed to test
+things with our dot each and it's
+running it twice we can see it's running
+twice and this magic dollar s or
+percentages
+is actually taking that parameter here
+mime type and putting it here so we can
+then see the mime type that we're
+testing the generate photo file name
+function with each time we're calling it
+and then it's checking the extension
+that comes back in that file name to
+make sure it's matching png or jpeg
+depending on which test it is
+so we've got that up and working and
+we've got that tested
+because it's much easier to test a
+function like this in a unit test than
+in an api integration test
+now we need to configure malta to
+actually use it with the disk storage
+so we're going to say use the file name
+option and then we pass through a
+callback function which will accept the
+request
+the file and a callback
+and
+from this we're going to then return a
+quote we're going to call the callback
+so we we don't actually
+uh need to pass through any error
+because the first one would be null
+and so we can say null because there's
+no error to pass and then we say
+generate
+photo file name
+and then we're going to pass through the
+files mime type property
+and then that will actually
+mean that we generate a photo file name
+and then we're returning that to malta
+so a motor is actually saving a file to
+disk it's going to call our generate
+photon generate photo file name function
+and then actually use that to generate
+the photo file name and that's the name
+that we use to save the file to disk
+so if we save those changes we can now
+go and start up our web server again
+and we can then start up our api
+with npm run dev
+and then once that's all started head
+back to our browser
+and if we go back in our browser to our
+upload page refresh that
+we can browse and then we'll upload the
+jpeg this time
+and so when we upload the jpeg we'll see
+now we've got that randomly generated
+file name with those letters and numbers
+and then we've got that dot jpeg file
+extension
+and we if we look here in our uploads
+directory we've got that correct file
+extension so we can now go and view the
+file
+so what we've done is we've taken that
+mime type that's coming through that we
+can see being output here in our debug
+logging
+that image jpeg we've passed it in to
+the mime dot get extension method to get
+the file extension and we've generated a
+random file name we put those two
+together that file extension and that
+random file name and we've then given it
+to malta so that it knows how to
+actually save that file and what file
+name to use and so then when it's saved
+we've got that full file extension
+in the file name and so we can actually
+go ahead and view the uploaded images
+so let's stop everything running
+and then we can go ahead look at the
+changes we've made
+and we can get at all of those
+and we can then git commit
+configure motor
+to save files
+with file extensions
+and so we're just handling those two
+image types there and then we can push
+those up
+to github
