@@ -25,7 +25,7 @@ app.use(express.json());
 
 app.use(cors(corsOption));
 
-app.get("/planets", async (request, response, next) => {
+app.get("/planets", async (request, response) => {
     const planets = await prisma.planet.findMany();
 
     response.json(planets);
@@ -44,10 +44,7 @@ app.get("/planets/:id(\\d+)", async (request, response, next) => {
     response.json(planet);
 });
 
-app.post(
-    "/planets",
-    validate({ body: planetSchema }),
-    async (request, response) => {
+app.post("/planets", validate({ body: planetSchema }), async (request, response) => {
         const planetData: PlanetData = request.body;
         const planet = await prisma.planet.create({
             data: planetData,
@@ -56,10 +53,7 @@ app.post(
     }
 );
 
-app.put(
-    "/planets/:id(\\d+)",
-    validate({ body: planetSchema }),
-    async (request, response, next) => {
+app.put("/planets/:id(\\d+)", validate({ body: planetSchema }), async (request, response, next) => {
         const planetId = Number(request.params.id);
         const planetData: PlanetData = request.body;
 
@@ -83,8 +77,7 @@ app.delete("/planets/:id(\\d+)", async (request, response, next) => {
     try {
         await prisma.planet.delete({
             where: { id: planetId },
-        });
-
+        }); 
         response.status(204).end();
     } catch (error) {
         response.status(404);
@@ -92,20 +85,18 @@ app.delete("/planets/:id(\\d+)", async (request, response, next) => {
     }
 });
 
-app.post(
-    "/planets/:id(\\d+)/photo",
-    upload.single("photo"),
-    async (request, response, next) => {
-        console.log("request file", request.file);
+app.post("/planets/:id(\\d+)/photo",
+    upload.single("photo"), async (request, response, next) => {
+        console.log("request file", request.file)
 
         if (!request.file) {
             response.status(400);
             return next("No photo file uploaded.");
         }
 
-        const photoFileName = request.file.filename;
+        const photoFilename = request.file.filename;
 
-        response.status(201).json({ photoFileName });
+        response.status(201).json({ photoFilename });
     }
 );
 

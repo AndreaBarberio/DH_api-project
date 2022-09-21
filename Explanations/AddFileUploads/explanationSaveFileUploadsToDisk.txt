@@ -1,0 +1,322 @@
+in this lesson we're going to configure
+the molten middleware to save uploaded
+files to disk
+we've created our photo upload route and
+we've configured the molten middleware
+to handle file uploads but at the moment
+we're not actually saving those uploaded
+files to disk
+so let's go ahead and create some tests
+for uploading real image files and then
+we'll get multi-configured to save those
+files to disk so we'll open up our test
+file here server.test.ts and we're going
+to open up a new terminal and we'll
+start our test in watch mode
+now
+when we actually are wanting to test
+these file uploads we need some test
+files and these are known as test
+fixtures
+and we're going to actually add some
+images which we can then use in our
+tests so we'll press a just to confirm
+that all our tests are currently working
+and then here in the root of our project
+we're going to right click new folder
+and we'll call this test fixtures slash
+photos so that'll create a photos
+directory inside of it
+and we're going to actually grab some
+test photos that we can use so here's
+the lorem ipsum illustration website and
+this has some test images
+they've got this nice planet image over
+here which we can use
+and then we can open that up in a new
+tab so i've got this one over here
+and then we can save that image
+and then we can save that as file.png
+so we're going to be handling png file
+uploads in our api
+and then for jpeg images the lauren
+pixon website it's a good choice at
+pixelm.photos
+and here i quite liked this photo that
+they have of planet earth from space
+taken by nasa i've got that open here
+and we can right click save that image
+as or save that as file.jpg
+so now if we head to vs code
+and we take a look in our test fixtures
+photos directory because we've got
+file.jpg on file.png
+now let's create a new file inside that
+photos directory called file.txt
+and
+we will use this
+as we want to be able to actually test
+in our in our tests when we are
+uploading a file that isn't an image
+what actually happens in our api so
+we'll need to be adding some handling in
+for that as well so this is not an image
+so we've got these three test fixtures
+ready to use let's close those for now
+and we're going to go ahead and write a
+test for a valid request with a png file
+upload
+so let's create a new test block
+and
+we will be testing uploading that test
+fixture png that we just saved just now
+now let's make this an async function
+here
+because we're going to use await request
+as we have for all our other tests we'll
+be using supertest
+so then we call dot post
+and then this is planets
+for planet 23 and we'll add the photo
+and then we're going to attach
+on the photo field
+we're going to then add that test
+fixture png image so test fixtures
+photos file.png
+and
+if we
+take a look this field name that we've
+got here where we're attaching photo
+it's the same as the name of this input
+this file input we have on our html form
+and it's what we've configured malta to
+look for on our route when it's handling
+file uploads
+so the photo field we're going to upload
+that fixture that file.png that we have
+over here
+to our api and then we're going to
+expect a 201 status code and that's that
+201 status code we have here in our root
+handler once we've handled a file upload
+successfully
+so we're expecting a 201 and then we're
+going to actually make sure the same as
+we have for all our other success routes
+then we've got that course header which
+limits the origin for any requests that
+come from a browser so we'll drop that
+in as well
+and now if we go ahead and save this
+we'll save and we'll see our tests are
+running
+and that's all looking good but at the
+moment we don't have anything configured
+in motor for it to save files to disk so
+let's open up malta.ts
+and we're going to add some
+configuration here so we're going to
+create a storage instance
+so storage is the way that we tell malta
+where we want it to put the files so
+we're going to create a disk storage
+instance and we're going to pass it the
+destination object
+and we're going to we're telling it that
+we want to actually save any files to a
+directory called uploads
+and if uploads doesn't exist when our
+application starts multi will
+automatically create this for us
+so that's all good let's actually now go
+and use the storage options over here so
+we'll
+remove that motor options then we'll
+create a new object we're going to add
+storage
+and then we'll spread in the motor
+options so now that we've saved if we
+save this file
+we'll see our tests are re-running
+because we've got them in watch mode and
+an uploads directory has been created
+and it has that file there
+so that's a test file that we've
+uploaded through our route here this
+fixture file now if we stop our test and
+run npm test again
+we'll notice that every time that we run
+npm test a new file is created in that
+uploads directory we don't want that to
+be happening because as we run tests
+over time we're going to end up with
+lots of junk files so we want to add a
+mock to stop the files being saved to
+disk when the tests are run
+we only want files to be saved to disk
+in production when we're actually
+running the application for real or when
+we're running it in development for
+testing but not when we run our test so
+let's delete those uploads
+and we're going to go and create a mock
+in this middleware directory so new file
+motor
+dot mock dot ts
+and in here we're going to import motor
+from the motor module
+and then we're going to create just.mock
+and we're going to be mocking that motor
+module
+so our motor module this is our motor
+module here not the actual motor module
+from the package so this is motor our
+module that we're mocking
+and inside of this function here we're
+going to say const original module
+and we're going to actually
+use jess to pull in that original motor
+module and what that allows us to do is
+to access
+everything that is exported here so
+we're exporting the options and we're
+exporting the init motor middleware so
+it allows our mock to be a mix of real
+things from our module and some things
+that we're going to override as well
+so from this function we're going to
+return and we need to pass this through
+for just mock to work correctly
+so it's es module true and then we're
+going to use those original module
+exports and then we're going to override
+the init motor middleware function
+and that's because the inner multiple
+middleware function is the function
+which creates the new motor instance and
+tells multi-which storage to use
+so let's copy this line here
+and we'll drop it into our function
+and then we're going to change things
+around a little bit so there's no longer
+using disk storage
+so we need to adjust this here to use
+the original module
+dot multi options
+and then here the storage we're going to
+actually say that the storage is motor
+memory storage
+and that's the default storage that
+motor has but we've actually been
+telling it here in our multi-module that
+we want to use the disk storage so this
+here is actually overriding that inner
+motor middleware to create a motor
+instance that uses memory storage
+instead so that we won't save files to
+disk
+now in order to get jess to use this
+file to use this mock that we just
+created we open up
+just.config.js
+and in here in this array setup files
+after m we're going to go and add that
+path so let's scroll up right click
+multi-mock and then copy the relative
+path
+and then here we type dot slash and then
+paste in that file path
+so now we configure jess to use that
+mock we can go and start up our tests
+again
+and when we run those tests
+we should see everything passing so our
+test here where we're uploading the file
+has passed along with all our other
+tests but there are no files in the
+uploads directory so we're not getting
+all those junk files created
+now let's go and add a comment above the
+tests
+and just to describe that we've got that
+mock in place and that helps us
+understand if we or another developer
+are coming back in the future to
+understand what's going on with these
+tests and how they're working so it uses
+multi memory storage
+and this makes sure that
+we've got a clear understanding of
+what's happening here
+so no files are written to disk
+so now we've got that working with our
+tests we actually want to go and do a
+manual test and upload an image through
+the web page so let's npm run web
+and we'll use our upload form so we can
+open that up here
+and then we can open up the upload form
+now to upload we need to actually open a
+new terminal split to the side and we
+run npm run dev to start up our api
+now our tests are using this malta mock
+but the actual real server when it's
+running here with npm run dev is going
+to use the disk storage
+so when we actually go and upload a file
+we should see it come here into the
+uploads directory
+so let's head back to our browser
+and we can browse and we're going to use
+one of those test fixture files we'll
+use the file.jpg
+and then we can submit the query
+and that's uploaded it and now we can
+see we get a photo file name in the
+response and if we head into vs code we
+can see that motor has actually uploaded
+the file here and saved it to disk we've
+got that debug output so we've got here
+in our root handler after the
+file has been handled by motor and save
+to disk we've got request.file being
+logged out and we can see here that the
+original file name was file.jpg it's got
+a mime type
+of image jpeg and that everything has
+then been saved that file has been saved
+to the uploads directory so we've got
+everything working really nicely here
+and we can go and take a look at what
+we've got to commit so let's close this
+one here and then stop our web instance
+running and if we run git status we'll
+see quite a few changes to commit
+now the uploads directory that we have
+here where we're uploading the files we
+don't want that to be committed to git
+those are things that we don't want to
+actually end up in our git repository so
+we're going to open up the get ignore
+directory
+or that file that git ignore file and
+then we say we'll put a comment to
+explain what this is uploaded planet
+photos just so we know what this rule is
+for and then we say upload slash to
+ignore that uploads directory
+and now if we run git status again
+we should see that the uploads directory
+is no longer going to be added by get so
+we can safely go and get add everything
+and then git commit
+we'll say that we've configure motor
+to save files to disk
+and then we can go ahead and push all of
+those changes
+up to github we've now configured motors
+so that when we upload files they're
+saved to disk and we've also configured
+things with jess so that when we're
+running our tests we don't accidentally
+create all these junk test files
