@@ -1,8 +1,8 @@
 import supertest from "supertest";
 
-import app from "./app";
+import app from "../app";
 
-import { prismaMock } from "./lib/prisma/client.mock";
+import { prismaMock } from "../lib/prisma/client.mock";
 
 const request = supertest(app);
 
@@ -283,14 +283,16 @@ describe("POST /planets/:id/photo", () => {
     });
 
     test("Invalid request with text file upload", async () => {
-       const response =  await request
+        const response = await request
 
             .post("/planets/23/photo")
             .attach("photo", "test-fixtures/photos/file.txt")
             .expect(500)
             .expect("Content-Type", /text\/html/);
 
-            expect(response.text).toContain("Error: The uploaded file must be a JPG or a PNG image.")
+        expect(response.text).toContain(
+            "Error: The uploaded file must be a JPG or a PNG image."
+        );
     });
 
     test("Planet does not exist", async () => {
