@@ -1,0 +1,282 @@
+in this lesson we're going to learn
+about authentication and how it's an
+important part of building secure web
+applications we're also going to learn
+about the different types of
+authentication that can be used for
+users and apis
+authentication is the process of
+verifying an entity's identity
+this allows us to restrict access to
+services and information an entity can
+be a human user for example when we go
+to a website and enter a username and
+password to log in that triggers an
+authentication process
+an authenticating entity can also be a
+computer system such as one api calling
+another
+when working with authentication we'll
+also hear the term authorization it's
+important to understand the difference
+between authentication and authorization
+authentication is about checking if a
+person should be allowed in and if so
+who that person is
+this is what happens for example when
+you log into a website
+authorization is what happens once a
+person is logged in it's a process of
+checking what they're allowed to do
+this is what happens for example after
+you're logged in when you try to access
+a restricted web page on a website
+let's take a look at the different types
+of authentication for users and apis
+local authentication is the most common
+form of authentication that we'll
+encounter on the web it's used to
+authenticate users on a website
+typically with a username or an email
+address and a password the
+authentication is considered local
+because it's not using any external
+services to authenticate the user
+for example on the netflix website if we
+enter our email address and password and
+click the sign in button when we click
+sign in it will make a request to the
+netflix servers which will then
+authenticate us against their user
+database checking our email address and
+our password and making sure that we're
+allowed to access our the account on
+their website
+http basic authentication can be used to
+authenticate users with the username and
+password if we go to a url that is
+secured with http basic authentication
+we'll see a prompt like this in our
+browser prompting for a username and a
+password so if we then enter in our
+credentials our username and our
+password if we enter them incorrectly
+we'll be prompted again
+and then when we actually enter the
+correct credentials we'll see the secure
+web page
+we can actually see what's going on with
+this by making a call request
+so let's go and make a call request and
+we're going to pass through a username
+and a password so the first part is the
+username and the second part is the
+password and then we're going to make a
+request to our secure url
+and we can see that when curl is making
+a request it's sending through an
+authorization header and it's saying
+that the authorization type is basic and
+is passing through an encoded version of
+the username and password
+now in this case we put in the wrong
+username and password so we've got
+backup 401 unauthorized and that's what
+it says here in the response body
+if we make that request again but put in
+the correct password which is secret
+we'll see that it's made the same
+request but with the correct credentials
+encoded here in the authorization header
+and we've got backer 200 okay and we've
+been allowed to actually access this
+resource
+now although we can see here that we've
+got this authorization header with this
+value there it's not actually encrypted
+it's just encoded so in production if
+we're using basic authentication these
+credentials must be sent over https to
+keep them secure
+and https is when we have an https
+certificate which actually encrypts the
+data between a web browser or a curl
+command line client and the server
+itself so that only the client and the
+server can read the username and
+password credentials that have been
+passed between them
+http digest authentication is similar to
+http basic authentication but it's more
+secure as it uses encryption
+if we actually try and access a url here
+which is protected with with http digest
+authentication we'll get a prompt and we
+can then enter our credentials
+and
+if it's incorrect it will prompt us
+again but we can then when we enter the
+correct credentials it'll allow us to
+access the secure resource
+we can again see with cole what's going
+on when we make this type of request
+so we'll pass through a username and
+password credentials
+and then we'll tell it that it's
+expecting digest authentication that
+that's what the server is requiring
+and then we are going to access that
+secure url
+and we've now made a request but it's
+the incorrect details and so we've got a
+response back saying we're not
+authorized to access this server
+now if we go and actually enter the
+correct credentials
+in this case the password is secret
+we'll see that we've got a 200 okay back
+and we've got an html response back from
+the server
+the difference between this and basic
+authentication is that things are
+encrypted and this is done by sending
+two requests to the server so we can see
+that cole has made a get request where
+it has actually sent through
+the a single username so it's sent
+through the username theo
+and what we're able to do then is
+actually get back a response from the
+server which includes this nonce value
+and that nonce value is what we're going
+to then use and what curl then uses to
+encrypt
+data that it sends back in the response
+so it's going to actually send another
+request now and this other request we
+can see happening here where it's doing
+a get again but it's sending through a
+much longer authorization header it
+includes the username and it includes
+this cnonce which is actually the
+encrypted
+value so it's taking that nonsense
+provided by the server and then the
+username and password and encrypting it
+all and then on the server it's
+decrypting it so it's an extra layer of
+authentication that makes things more
+secure now although this authentication
+strategy uses encryption we should still
+use https in production
+http bearer authentication can be used
+for api authentication
+to do this we send a token in an
+authorization request header so if we
+make a request now to our secure
+endpoint but without
+a
+token
+we'll get a response saying 401
+unauthorized
+and so now if we make that request again
+but we go and add an authorization
+header
+we'll say that the authentication scheme
+is bearer and we're passing through this
+abc123
+and that's our token here
+and now if we make the request to our
+server it's actually allowed us through
+so it's a 200 okay and it sent back this
+response
+now this was actually sent over in plain
+text so we should definitely be using
+https in production if we're sending
+through
+tokens in this way
+but the server is giving access to the
+bearer of the token
+abc123 in this example the curl command
+line tool
+so here the token that we're actually
+using is fixed it's a pre-shared token
+that the client knows about without
+making any requests to the server
+another common type of bearer token is a
+json web token
+also known as jwt
+and we can see an example of one here
+so jwts contain a payload of data for
+example
+information about a user
+and the jwts are then encrypted so that
+only systems with access to a secret
+value can decrypt them and here's the
+encrypted json web token jwts are often
+used for granting access to apis
+so after a user is logged in the server
+will generate a json web token and send
+it to the client
+then when the client makes requests to
+the server it will include the json web
+token in an authorization header to
+access protective resources
+if we were making a request with a json
+web token it might look a bit like this
+with an authorization header specifying
+the bearer scheme and then we have a
+long encrypted json web token
+the server will then decrypt the json
+web token and verify it to determine if
+the client is authorized to access the
+protected resources
+oauth is an open standard that can be
+used for user and api authentication
+it allows users to grant a website or an
+api access to their information on
+another website but without the need to
+provide their account password here
+we're going to actually take
+ourselves through an
+authorization flow with github so if we
+click on this login link it then
+presents a page on github
+and we're going to grant an api limited
+access to our github account information
+so we can see here we're actually going
+to just give it access to our email
+address on our account
+we don't have any need here to enter a
+github account password and we don't
+have to provide that to the api that's
+requesting access to this limited
+information on our github account so we
+can then authorize that api
+and it will redirect us back and we've
+actually now authenticated ourselves
+with that api using github and it has
+limited permission to actually access
+some of our github details
+in this unit we'll be building an oauth
+authorization flow with github into our
+node.js application
+when we're building authentication into
+web applications it's important that
+what we implement is secure
+poorly built authentication can
+potentially result in people being able
+to access systems without the correct
+permissions
+the open web application security
+project or owasp foundation
+work to improve the security of software
+by providing free resources to help
+developers for example their
+authentication cheat sheet provides best
+practices for authentication and can
+help us build more robust authentication
+systems
+we're now ready to start building
+authentication into our node.js
+application

@@ -1,0 +1,129 @@
+in this lesson we're going to create a
+web page that allows us to add a planet
+then we can start thinking about
+building authentication into our
+api let's create a new file in the web
+directory named add.html
+and we've got a prepared html web page
+here and we're going to select all of
+that copy it and then paste it into
+add.html and we can then close this
+prepared file
+now let's take a look through the code
+in this web page so we have an html form
+and the action is pointing at our api
+endpoint planet
+and when we actually make this request
+it's going to be a post request so we'll
+be sending through form data and we've
+got these individual form fields we've
+got the name for the planet the diameter
+which is a number and the moons which is
+also a number and then we've got a
+submit button here
+now to handle that sending the data in
+this form we actually need to use some
+javascript because our api is expecting
+the request body to be formatted as json
+so we're attaching an event listener
+here so when the submit event fires on
+this form when somebody clicks the
+submit button or they press the enter
+key on their keyboard
+it will then trigger our add planet
+function and this is the javascript
+function here which actually pulls all
+that data from those form input fields
+and then converts it into a json string
+and we then take that json string and
+we're sending it using fetch to make an
+http request to our api and it's going
+to be sending that with the content type
+application json
+when our api responds we will then get
+that json response from our api and then
+log it out to the console
+now let's start up our web server and we
+can also then start up our api to see
+things running in our browser so npm run
+dev to start the api
+now if we head over to our browser we
+can open up
+localhost port 8080
+and then we can see our web pages so
+let's head through to our newer page
+add.html and we can see the html form
+that we've just created so we've got the
+name field and we're going to put in
+venus here
+and then set the diameter to one two
+three four and we'll say that it has six
+moons
+now if we click our planet it will run
+that javascript to send the request
+we can see that a request has been made
+but we've got a 422 unprocessable entity
+response
+now if we take a look that's because
+we've actually got some validation
+errors and the error that we're getting
+back is that the diameter this field
+here must be an integer
+now we've actually set the
+input type for that html input to be a
+number but what happens when we actually
+get those values back and if we look at
+the request when we're sending it
+through the diameter and the moons which
+both need to be numbers are actually
+getting sent through strings
+now this is just a behavior of the way
+html forms work on web pages so we need
+to do a little bit on our api to
+actually change that and to be able to
+work with those types of values
+so if we go into our lib validation
+index.ts
+we can then actually change the
+configuration when we actually create
+our validator instance so inside this
+object we're going to pass coerce types
+true
+and what this will do is when it sees
+the numbers that come through here but
+that are inside a string it will
+actually coerce the type from being a
+string to being a number and then our
+validation will pass because if we take
+a look here we're telling
+it that the validation is requiring the
+diameter and moons to be integers to be
+number values so this coerced types will
+take those number-like strings and
+convert them to numbers for us so now
+we've saved those changes and our
+servers api server has restarted let's
+head back here we're going to just clear
+the console with this trash icon here
+and then now if we make a request we'll
+see that we get back a successful
+response and that planet has been added
+to our database
+so that's great we've now got this set
+up and any user can access this webpage
+and add a planet
+so let's go and actually commit all our
+changes we can stop things running
+here in the terminal
+we'll look at the changes we've made
+with git status
+and then we can get add all of them
+and git commit add a web page
+for creating a planet
+and then we can push all those changes
+up to github
+the way we set things up currently any
+user can go and create a planet we
+actually want users to authenticate
+first before they can create a planet
+we'll be working on that next
