@@ -1,0 +1,383 @@
+in this lesson we're going to refactor
+our application so that it's ready for
+us to add in authentication
+the first change we're going to make is
+to move our application configuration
+into one script
+so right now we have
+process.emv.ports here in our server.ts
+but as our application grows we're going
+to start using more environment
+variables and it'll be helpful to have
+one place where we pull in all of that
+configuration
+so let's create a new file in the same
+directory src called config.ts
+and inside of that we're going to
+actually create a config object
+and then we're going to
+set one called port which is that one
+that we've already got and that will be
+process.emv.port
+and then we can actually go and export
+that so we can export default config
+now
+what can sometimes happen so we've got
+our emv file over here
+is that sometimes settings might be
+missing so we've got ports set here but
+if we've forgotten to set it we need a
+way of knowing that it's missing so
+we're actually going to put something
+here where we can actually
+have that value be
+a warning message so we're going to say
+const missing setting
+and i will say warning
+no value set for this environment
+variable
+and we'll use this as a way of warning
+us when we haven't set a value so we can
+say
+process.emv.port and we can say or
+missing setting
+and because
+javascript actually looks for truthy
+value so this if this evaluates to true
+so if it has a value set like 3000 in
+our case then it will use this value if
+that value is falsy so if it's empty or
+if it's not got a value there it will
+then actually use this missing setting
+string so the value then for config.port
+will be the missing settings string and
+we can then see that output in our code
+when we try to use it and that will give
+us a hint that something's missing
+so now we've got that set up let's
+actually head back into server.ts and
+actually use this so we're going to say
+import
+config
+from
+config
+and then down here we're going to
+replace process.emv.port
+with
+config.port so we're now pulling in that
+configuration where we've set over here
+in our config.ts
+now let's run our test to actually check
+that everything's still working with our
+application
+and it's a really important thing to do
+after we've refactored anything in our
+in our code to check that everything's
+still working so we can see all our
+tests are passing which is great so we
+can say get status and then get out all
+of our changes
+and we're going to commit that
+move or configuration into
+one script
+and
+then we can push those changes up
+and the next change we're going to make
+is to actually refactor our app.ts file
+so let's close these files that we have
+open
+and take a look at our app.ts
+so right now our app.ts contains
+everything for our application it's got
+all the roots here and so as we're
+actually going to build in
+authentication next we're going to be
+adding more routes this file could get
+really long and quite hard to manage so
+let's split out the routes and we're
+going to do that by in src we're going
+to create a new file
+called roots planets
+dot ts
+that will create a new directory for us
+and in planets.ts we're going to import
+express and we're going to also
+import the router as well so router is
+actually a feature that's available in
+express under the hood by default it's
+creating a router instance but we're
+going to explicitly create our own
+router instance in just a moment first
+of all we're going to head back to
+app.ts
+and we're going to pull over a few of
+the imports that we have here so we've
+got prisma and the validation middleware
+and also the molten middleware so we're
+going to
+cut that oh we need to also take the
+init part here and we're going to cut
+all of that
+and then drop it over
+into
+planets.ts
+because because we'll be using them in
+our roots and so now we've done that we
+need to actually fix the import paths
+because we're down inside this roots
+directory whereas app.ts
+was over here in a different
+place so we're going to say we just
+change that to an extra dot so that
+means
+that we're going up one level so it's
+saying from this planets file which is
+in roots go up one level which is to the
+src directory and then down into lib and
+then down into for example prisma and
+client so we've just fixed those import
+paths and now we can go ahead and create
+a router instance so we're going to say
+const router equals router
+and we'll be exporting
+that as the default export from this
+file
+so we can actually now go back over to
+app.ts
+and we can see here we've got all of our
+routes so
+after that cause middleware we're going
+to select all of our routes
+and once we've got them all selected
+we'll make sure we leave that validation
+error middleware here we're going to
+take all of these routes cut them
+and then we're going to save this file
+and then paste these changes over into
+our planets.ts roots file
+now as we've been doing this you can see
+there are quite a lot of different
+errors that's pretty normal was for
+refactoring code typescript's constantly
+checking how we set everything up but
+we're going to now actually fix some of
+these errors and we're going to do find
+and replace so
+we press ctrl h and we can say we're
+going to replace app dot with rooted dot
+because we don't have an app instance
+here we have a router instance and so
+then we can say
+replace all and we'll click on that and
+those errors have all been fixed because
+we're now using the router instance we
+also want to actually go and edit the
+routes that we have the actual paths
+that we have because we're going to
+actually be mounting them onto our app
+in a moment and saying that all the
+roots in this root are under slash
+planets so we no longer need slash
+planets in our root paths so we can
+remove them all here
+and we'll do that for every root
+and that will allow us to mount all
+these routes under slash planets so
+we'll get this last one here
+so now we can actually
+look at re-adding the import of the
+validation error middleware over here
+because we've got it missing in app.ts
+so we're going to say that we will
+import
+validation
+error
+middleware
+and that's from our lib validation
+and that should now fix the error that
+we had here
+so app.ts is in a good shape and so is
+planets.ts now to use the routes we've
+got we need to actually go ahead and
+import them so we're going to import
+planets roots
+from
+roots
+planets
+and now to actually use them we call
+app.use and it's important that we put
+it after the cause middleware so we see
+app.use and this is where we're mounting
+the roots under slash planets
+and then we're going to have planets
+roots here
+so we've got our router here with all of
+our planet routes
+and we're then actually
+exporting it from this file
+from our roots file for planets and then
+we're importing it here and then we can
+mount it under slash planet so that
+everything under
+this router will be prefixed with slash
+planets
+so we've moved everything around here
+quite a bit and we're also going to move
+our tests so they're currently in
+server.ts and it's normal as we're
+building an application for things to
+change and it makes sense to rename and
+refactor things so let's actually move
+server.ts into our roots directory and
+we'll confirm that
+and then we're going to say yes
+automatically update imports so
+this is what happening here is vs code
+if we open up our
+server.test.ts
+we'll see that at the top here it has
+changed these imports so that those
+paths are correct so it's done that
+automatically for us
+and we can save that and we're going to
+rename this file to match up with our
+roots file so we'll call it
+planets.test.ts
+for consistency
+so now that we've actually moved
+everything over we're going to head back
+to planets.ts we can see we've got one
+little error from eslint and that's
+because we've got this unused import so
+we don't need that validation error
+middleware that's being used in app.ts
+we can save the changes
+and now we're going to run our tests and
+check that everything's still working
+with our application
+so everything's passing we can confirm
+that moving all our routes has happened
+successfully and we can now actually go
+ahead and commit the changes that we've
+made so we'll look at the changes we get
+status
+and we're going to git add everything
+and then git commit
+and then say refactor
+planets route
+out of
+app
+out of main app file or app script
+there we go
+and we can press enter and then push
+those changes up to github
+and the last set of changes we're going
+to make are refactoring some things
+around our middleware and this is just
+about getting some consistency with how
+we have things organized
+so if i close these files here
+we've got currently we're using
+validation error middleware and we've
+got some cause middleware and actually
+if we look at planets.ts
+where we've got the validation
+middleware coming in here
+now at the moment under lib we have a
+middleware directory we also have
+validation over here
+now as this is all pretty much
+middleware inside of here we're actually
+exporting validation error middleware
+and we're exporting a validate
+middleware we should probably move this
+validation directory under middleware so
+we'll drag it
+into the middleware directory and then
+confirm that we want to move it
+and say yes we want to automatically
+update the imports so we'll say yes and
+what that's done now in planets.ts we
+can see that it's changed the path there
+so it's correct for us we can save that
+change now if we look at app.ts we can
+see that it's also fixed a path there
+for us so we go go ahead and change that
+now all of our other middleware
+validation and malta and neatly
+organized over here in the middleware
+directory but right now we've got cores
+right in the middle of our script so
+we're going to actually create a new
+file called cause.ts
+under the middleware directory
+and we're going to move over everything
+that we've got to do with cores from
+app.ts so
+cut that import path
+and paste that in here
+and then we're going to create
+an initialization function for
+initializing the cause middleware so
+we'll say export function
+init cause middleware
+and then
+we're going to actually take the code
+that we have here
+for creating the cause options and we'll
+move that up here
+and we can just drop it inside the
+function
+and we can actually then also
+go and
+copy what we've got here so cause cause
+options and we're going to cut that
+and then we'll say return
+and we're going to return that
+so we've got this course ts file that's
+importing the cause module we're then
+exporting a init cause middleware
+function and that's where we've wrapped
+up our cause options
+and then we're actually returning a
+cause middleware instance which is
+configured with those options
+now to use it we need to actually go
+and
+import it here so we're going to say
+that we're going to import
+and our
+method is called init cause middleware
+and we're going to import in it cause
+middleware from
+that new
+cause middleware script and then down
+here we can say
+init calls middleware and we will call
+that function and it will actually then
+return that configured cause middleware
+instance and it will be using it then in
+our application
+so let's go ahead and run mpm test again
+and our tests include checks for those
+core hazards so we can be sure now all
+our tests have passed and that we've not
+broken anything with our cause
+configuration
+so let's go ahead and run git status and
+we can see all these changes that we've
+made to refactor our middleware
+and we can say
+get ads and then we'll hit commit all of
+the changes we've made
+re-organize middleware
+and then we can go and push all the
+changes up to github
+as our applications grow we'll often
+find ourselves refactoring code that
+we've written before to work in a
+slightly better way or to organize
+things more consistently
+we've now set everything up in our
+application and we're ready to start
+adding authentication
