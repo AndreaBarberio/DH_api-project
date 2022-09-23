@@ -1,0 +1,195 @@
+in this lesson we're going to learn
+about the decorator design pattern and
+how to apply it in node.js
+the decorator pattern is a structural
+design pattern allows us to dynamically
+change the behavior of an existing
+object it can be useful for changing the
+behavior of specific objects without
+affecting other objects of the same type
+let's take a look at some of the ways we
+can apply the decorator pattern one way
+of decorating an object is with
+composition
+so here we have a class text and it has
+a constructor which accepts some text
+and then inside of that it stores it
+as a variable string property in the
+instance and then we've got a to string
+method which actually returns that
+string value
+here we're actually creating a new
+instance
+of the text class and then calling the
+to string method to get that string back
+and then logging it out so let's run
+that script
+to see what it's doing right now
+so to actually decorate this object the
+specific object here so we can create a
+text
+instance so an instance of the text
+class we're going to then decorate it
+with another class so the way we're
+going to do this is by creating a new
+class called blue text
+and
+inside of that we're going to have a
+constructor
+which accepts the text and then we're
+going to actually store that text value
+and now we're going to have a two string
+method as well
+but here we're going to actually return
+a
+string so we're going to
+call this.text.2string
+and so this is and it's going to be an
+instance of that text class and then
+we're calling the to string method on it
+now this clc here we're going to use
+this the cli color library so let's
+import clc from the cli color library
+and what this decorator is going to do
+is it's going to allow us to actually
+add like wrap behavior around our
+existing text class
+so if we now go ahead and actually
+use it
+we can call new blue text
+and then we're going to pass in a new
+text instance and we're going to say
+this text is blue
+and then we will actually call the
+tostring method on
+this instance so we're going to say then
+dot to string
+so what we've done here is we've created
+a new text
+instance and then we're passing it into
+a new blue text instance into the
+constructor method
+that's then storing it
+in the actual blue text instance and
+then when we call to string because it's
+got that same interface
+it's got a call then to the actual
+tostring method on our text class
+instance
+but we're wrapping it so we're taking
+the value from that and then we're
+passing it into the cli color library's
+blue method to make that text blue so
+we're decorating that existing
+text class that we have that or this
+specific object here because it's not
+actually going to be modifying this
+class
+so if we now go and run the script
+we'll see
+that it actually
+has this is some text and this text is
+blue
+so we've successfully decorated this
+particular object instance now we can
+prove that it's not changing the actual
+text class by actually outputting this
+afterwards
+so we're now going to run
+example one again
+and we'll see that we get this is some
+text this text is blue but this text
+here below is not blue so the decorator
+has only changed this instance of the
+text well it's wrapped around it but
+we're not actually changed anything
+about the text class itself so this is
+the composition approach to decoration
+another way of decorating an object is
+to actually use object augmentation so
+this means that we're going to actually
+directly modify the object here again we
+have the class text and we have a
+constructor which accepts the text and
+then it's a string method which actually
+returns that text and then we're
+creating a new instance of it here and
+then calling this to string method
+so we're going to now create a function
+called blue text
+which we'll be using to actually
+decorate
+any instances that we pass into it so
+we're going to say let original to
+string and we're going to store a
+reference to the text to string method
+and the reason for doing this is because
+we're actually going to overwrite it so
+now we're going to say text.2string so
+on that text instance we're going to
+overwrite the tostring method and assign
+our own function
+and this function is going to actually
+then
+do its own thing
+something a bit different so it's now
+actually going to we're going to call
+that original to string method
+inside of this so what we're doing here
+is we're saying this original to string
+method that we stored up here we're
+calling dot apply so that means call
+that method but in the context of the
+text instance
+and so when we're actually calling that
+well we're calling that original method
+we've actually overridden it here so
+that when we call the bluetext instance
+so we're going to actually be returning
+the text object so when we actually get
+the object back out of here and we call
+dot to string it will call this one that
+we've overridden it with and then that
+will call the clc.blue function so we
+need to actually import
+clc from cli colors so we've got that
+blue method for making the blue text and
+we're passing into that the result of
+the original to string method so we'll
+be returning that string for us
+so now if we actually go and use it
+instead of actually just wrapping the
+code we're completely augmenting it by
+overwriting that to string methods so
+we're calling blue text and then we're
+going to pass in a new instance
+this text is blue
+and then we'll call the to string method
+so our our method here is actually
+changing what's going on with that
+instant that text instance so we can run
+it with node example 2 dot mjs
+and we can see that we get this is some
+text and this text is blue and again we
+can prove that this decorator is not
+modifying the original class instance
+it's not changing that for any other
+instances of that
+so we can then see that yes we've got
+this text this regular and then this
+text is blue and then afterwards we've
+got another text instance that hasn't
+been affected by our blue text decorator
+because it's only modified this instance
+here that we passed in and it's
+overridden it's to string method to to
+add in our own one um but it's also
+calling the original one to get that
+value back and then we're able to
+actually wrap things and augment the
+behavior by wrapping it with that blue
+method to make the text blue this
+approach is also known as monkey
+patching the decorator pattern is a
+flexible way of adding new functionality
+into our code
