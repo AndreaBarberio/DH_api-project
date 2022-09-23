@@ -1,0 +1,394 @@
+in this lesson we're going to integrate
+the passport authentication library into
+our application and then configure it so
+the users can log in with github
+we'll then integrate the express session
+library so that we can keep track of who
+users are once they've logged in
+we're going to be using the passport
+authentication library which is a
+popular authentication choice when
+building applications with node.js we'll
+be installing the main passport package
+we'll also be installing passport github
+2 which allows us to configure passport
+to setup login with github and we'll
+also be installing the express session
+package
+which allows us to keep track of who a
+user is after they've logged in to our
+application
+so let's head over to vs code and in the
+terminal we're going to run mpm install
+and we're going to install passport and
+passport github 2
+and also express session
+and we also actually need to install the
+types for these so that we can work with
+them in our typescript code base so
+we're going to install those as dev
+dependencies we'll install the types for
+passport
+and for
+passport github 2
+and the types also for express session
+and once those have installed we can
+actually go ahead and create a new
+middleware file in our middleware
+directory we'll call this passport.ts
+and inside of that we're going to import
+the libraries we've just installed so
+we'll import passport
+from passport
+and we're going to import passport
+github 2
+from
+from our passport github to
+package
+and now we have those in place we can
+actually go ahead and create a new
+passport github 2 strategy
+so strategies are the term that passport
+uses for different ways of
+authenticating
+so in this case we're going to create
+new passport github 2
+dot strategy
+and so this is creating a new instance
+of that strategy class and we're going
+to pass through some options so we'll be
+passing in
+client id
+and for now we're going to set that as
+an empty string
+and then client secret again we'll set
+that as an empty string
+and then the callback url
+so we'll be actually adding these
+configuration settings a little later
+so now that we've got this set up we
+actually need to go
+and
+add in
+a callback function so we're going to
+add in this verify callback function
+and pass that in here
+so this is what will be run after
+someone has logged in with github so
+we're going to
+accept an access token
+and these are all things that are set up
+by the github
+authentication strategy so we'll set
+refresh token as a string and then a
+profile
+we're going to be able to have
+there are lots of different properties
+in a github profile and this type will
+allow us to accept all of them
+so we now have that in place
+and then we're going to say when it's
+done
+we can actually say error
+it's null
+and
+user is express dot user
+and
+the void type here
+now we're having to do this because the
+types aren't quite right for this
+library and it unfortunately means we
+have to define our own types for this
+function
+so now that we actually have that
+working we've got that there and
+we can go ahead and look at using
+the the function that we've got set up
+so we inside of this we're going to say
+const user is express.user
+and we're going to say that username
+and we'll say we're going to pull out
+the github username so when someone logs
+in with github they're going to actually
+get this
+come through and we'll get this whole
+profile object come through and it will
+contain a username now that's the only
+thing we want to store for our users
+and so then once we've done that we can
+say done null
+user and so we're then passing this back
+to passport and saying this is our user
+object store this for our users
+and we can have a look at what's going
+on with some of the type errors here so
+we've actually got passport declared but
+it's not being used
+so
+let's actually i think we've got a bit
+of an issue here with typescript server
+so if we do
+command shift p and then we can say
+restart ts server
+and that should actually resolve what's
+going on there so it's it's picked up
+things again so we actually need to see
+what's happening here
+we've actually not got quite the correct
+syntax
+and we need to put commons in here after
+those two values there so github's
+saving us from writing the incorrect
+types so now we actually have that set
+up we're going to go and create a type
+for this so when we actually have
+express user it can be anything and so
+if we click through to that definition
+we'll see right now it's just an empty
+object in the types for that package
+now that's down and deep in our node
+modules directory let's close those and
+we're now going to create a new file and
+this will be under src so we're going to
+create a new file and it'll be under a
+new types directory and it'll be
+index.d.ts
+inside of that we're going to declare
+global
+and then we're going to use the named
+space express and then inside of that
+we're going to say interface user
+and then we're going to say username
+string
+and then we can actually go ahead and
+export that
+or just have an empty export here this
+is just so the typescript can work
+correctly with this file that doesn't
+have any imports or exports so what
+we've done here is we defined a type for
+express.user and we said that that
+objects are going to contain a username
+this will allow us to go and actually
+use that inside of our roots later on
+so
+lastly inside this file we're going to
+say passport.use
+and we're going to say that we wanted to
+use that github authentication strategy
+that we've just created so github
+strategy that's that object we've just
+created here
+and we're configuring it to use it and
+then we're going to export our passport
+instance
+out from this now in order for passport
+to actually support persistent login
+sessions so that means that once
+somebody is logged in we want to still
+know who they are so that each request
+they make to our api we can look and
+figure out who they are and what their
+username is so we're going to actually
+pass some callbacks through to passport
+so the first one is passport.serialize
+user
+and
+we are going to call passport.serialize
+user and then we're going to pass
+through that express dot user type that
+we've just defined
+and that allows us to then go ahead
+and say user done we pass through a
+callback to this function and then we
+are just going to actually call that
+password null which is because there's
+no error and then user
+and so what this will do is when
+somebody is logged in it will then
+actually
+use take the user data and then store
+that user data in the session and this
+callback function will be used by
+passport to do that for us and then
+similarly once actually somebody makes a
+request
+and we need to retrieve the user data
+from the session on a future request we
+then will have a deserialized user
+callback so we're going to pass that
+through now and in the same way we'll
+pass through that generic type
+express.user
+and then we're going to pass through
+another
+callback function
+and inside of that we're going to call
+done
+and null user now we're not actually
+storing our users in our database so
+we've just got a simply that we're just
+passing back the user object that we've
+received so this is what's come back
+from the session and we know at this
+point that we're storing that username
+which is all we need for our application
+so now we've got those
+two things in place
+these two callback functions we can go
+ahead and actually configure our session
+where express will actually or the
+express passport middleware will
+actually go and save that data to so
+let's create a new middleware
+session.ts
+and
+sessions allow us to temporarily store
+data for a specific user so this is
+essential for adding authentication to
+our api so that when
+each request is made we know who that
+person is and so we're going to import
+the session middleware
+from
+express
+session package
+and then we're going to actually export
+a function to initialize that session
+middleware
+and then we'll be setting this up in our
+app.ts so we're exporting that function
+and it's going to return
+a session
+instance and we're going to pass in some
+options to that session instance
+now the first option we're going to pass
+through is secret now for now we'll set
+an empty string and we'll actually come
+back in a moment and give that a proper
+value and we'll also say resave to false
+and save uninitialized
+to false as well
+so we're creating a new session
+middleware instance and then we're going
+to be actually returning that from our
+function so the secret here is what will
+be used to encrypt our session cookies
+so
+when we actually create a new session we
+send back a cookie from our api to the
+browser and that contains the session id
+so the identifier is used to be able to
+look up the user session data in our
+application
+now we want to have that session id
+encrypted because it's a secure piece of
+information
+and so we want to then go and generate a
+secret that all of our session data will
+be encrypted with so we're going to run
+node e and then we'll do console.log
+crypto dot random bytes
+32 so a nice long string
+and we're going to say to string hex
+and that should then give us a nice long
+random value that we can copy
+and then we can go and paste it in here
+and use that as our session secret
+but we don't want to actually have this
+here in our code so
+let's undo that change and open up our
+m.t.s or m file and inside of that we're
+going to set session secret and this is
+where we'll actually store the secret we
+don't want to be putting secure secrets
+and passwords and values like this
+inside of our actual code remember we're
+not committing the emv file so we'll
+save that here and now we can go and
+update our config.ts
+to pull through
+that value
+so we can say session secret
+and we're going to
+undo process.emv
+dot session secret
+and then it's going to be all
+missing setting so if we've forgotten to
+actually go and set that value
+so we've got session secret being pulled
+through
+and now we can go ahead and actually use
+it inside of our init session middleware
+so we need to go and import our
+configuration so we're going to import
+config from
+and it's a couple of levels up
+so import it from there from our config
+and then here we can say that our secret
+is going to be config.session
+secret
+and so we've now set that up securely so
+we've got an emv file
+which where we've added our session
+secret which is this randomly generated
+string
+nice long string we're then pulling it
+through into our config
+dot ts and that's pulling it out of the
+environment variables that have been
+loaded and then in session.ts we're
+importing that config and using that to
+configure our session so that our cookie
+values will be encrypted using this key
+and make sure that everything's nice and
+secure
+so now that we have all of that in place
+we just need to head into
+app.ts and we're now going to use the
+middleware that we just created so we
+created session middleware and passport
+middleware so we're going to init
+session middleware is the import we're
+going to pull through from
+our session middleware
+and
+then we're going to import passport
+from
+our
+passport middleware
+and once we've got those imported we can
+actually then go ahead and use them so
+just after our app instance is created
+we're now going to configure it to use
+these middleware so we're going to say
+app.use
+and this will be init session
+middleware so we're going to call that
+function to get our session middleware
+which has been configured
+and then we'll call app.use
+and it says passport.initialize
+and we'll call that function and that's
+going to initialize our passport
+middleware which is all configured to
+use the github authentication strategy
+and then we're going to initialize
+passport session middleware which
+handles serializing and deserializing
+the user data into our session after a
+user is logged in
+so we've got all this configured right
+now and we can go ahead and look at all
+the changes
+that we've made
+and we can see there's quite a few of
+them and we're going to add all of them
+and then we can commit them so we can
+say git commit add passport
+with github
+authentication strategy
+and then we can go ahead and push
+everything up to get help
+we've just configured passport so that
+users can log in with github
