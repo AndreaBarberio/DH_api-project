@@ -1,0 +1,144 @@
+in this lesson we're going to learn
+about the adapter design pattern and how
+to apply it in node.js
+the adapter pattern is a structural
+design pattern it allows us to access
+the functionality of an existing object
+using a different interface
+adapters are effectively wrappers around
+an object or a class
+they can be useful for creating a
+simpler interface to an existing object
+or for implementing a common interface
+for different types of data storage
+let's take a look at some code that uses
+the adapter pattern
+here we have the log console adapter
+class and it has two methods it has an
+info method which uses the console.info
+method to output a message and then we
+have an error method which does a
+similar thing but using the
+console.error method
+now we can actually use this class by
+saying console.logger and then creating
+a new
+console adapter instance
+and once you've got that instance we can
+actually then call the message so we can
+call logo.info and say this is important
+information
+and then we can actually go and make
+another call this time to the error
+method and we're going to say something
+went wrong
+so we're now calling these methods on
+this logger
+adapter this log console adapter
+instance
+so we can actually go and run it down
+here
+with node example
+dot mjs
+and we'll see that we get the output
+from both of those console methods so
+this is actually an adapter for the
+console methods so we've wrapped the
+console object and its methods in this
+log console adapter class
+so what we have right here allows us to
+actually go and completely change the
+behavior of what we're doing so if we
+wanted to create another adapter one
+this time that actually writes the file
+system we could import
+the file module from node.js
+and then we can actually start wrapping
+the file system module so we'll create a
+new class called
+log file adapter
+and we're going to then have again info
+method
+and we're going to have an error method
+and inside of that we're going to then
+actually
+store
+diff data in a different way so we're
+not going to be outputting it to the
+console we're going to be writing it to
+a file so we'll call fs.append file and
+we're going to
+be writing to output.log
+and then we're going to actually
+put in
+an
+info and then we're going to actually
+use that message that's been passed
+through and then we'll add a new line in
+so that when we actually have other
+entries in the file they'll be on a new
+line and we just put in a callback
+to handle any potential error that
+happens when it's trying to write the
+file
+and
+then we have
+now
+this class which is a log file adapter
+and
+it has this info method and we're now
+going to copy and paste in error and
+we'll actually just change this here
+to be doing the same thing but putting
+in error
+so we have an adapter with the same
+interface as log console adapter so it
+has info and error methods they both
+accept messages but it actually
+abstracts the underlying file system
+module whereas our log console adapter
+abstracts the console module
+and so what we can then do is actually
+quite simply go and here change log
+console adapter to log file adapter
+and now if we go ahead and run our code
+again
+we'll see that we've got this output.log
+file and it's output those messages into
+a file for us
+so the flexibility that we have from the
+adapter pattern is that we've actually
+been able to
+without needing to go and change the
+code here where we're logging the
+messages just change what adapter we're
+using
+this is really powerful if we've got a
+large application with lots of different
+usage of this particular class say this
+logger instance
+and we change the behavior we don't want
+to actually need to go and rewrite all
+the code that's calling it so having
+adapters with common interfaces
+allows us to actually then abstract the
+way that we're actually handling that
+data when it comes in either writing it
+to a console here or writing it to a
+file
+so adapters are really
+a powerful way of actually
+creating abstractions in our code
+the adapter pattern is widely used for
+example the express session library
+accepts a session store object as an
+option this allows us to configure how
+data is stored all the available session
+store classes are adapters that wrap
+another object for example a database
+class instance
+another example of adapters are the
+malta library storage engines one writes
+to memory and another to the file system
+both of them wrap different objects but
+they both expose the same methods
