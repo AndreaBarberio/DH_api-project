@@ -1,0 +1,136 @@
+in this lesson we're going to learn
+about the dependency injection design
+pattern and how to apply it in node.js
+dependency injection is a pattern where
+an object receives the objects that it
+depends on
+the injector is the code that
+initializes the objects and injects
+their dependencies
+it can be helpful for separating
+concerns and keeping objects loosely
+coupled it can also help make code
+reusable and easier to test
+let's take a look at some examples of
+dependency injection
+here we have two classes we have a
+counter class and a logger class
+and we are creating a new counter class
+instance
+inside of the counter constructor we are
+actually then creating a new logger
+instance and storing it in an instance
+variable that we can then use in this
+log value method now if we go ahead and
+run the code that we have here
+we'll see that we've got this output so
+we've called
+created this new instance we've then
+called the counter increment method four
+times it's incremented the count and
+then when we call the log value
+method down here it's actually calling
+log value which is calling the logger
+instance that we created in the
+constructor here calling the output
+method of that and that is then
+outputting the count for us
+now with what we have here it works but
+the class classes are tightly coupled
+what that means is that right here we
+are explicitly creating a new logger
+instance
+and what we want to do is actually
+ideally have things separated so that we
+inject the dependencies for this counter
+class into the class
+so in this code down here we're going to
+change things around so that we inject
+stuff in and this will be the injector
+code that we have here
+now in order to do that we need to
+change our constructor a bit we're going
+to accept a logger argument and instead
+of actually instantiating a new logger
+instance here we're going to just store
+the logger instance that we'll be
+receiving here
+as a parameter so we'll store that there
+and then the actual code that we have
+here still works because it's pointing
+to this logger instance but we're no
+longer actually creating the logger
+instance inside of our counter class
+so now what we need to do is go down
+here and when we create our new count
+counter instance we're going to actually
+pass in a new logger instance and so
+we're injecting that dependency and so
+we're injecting it through the
+constructor this is one of the simplest
+forms of dependency injection and it's
+passing dependencies as arguments into
+the objects that actually depend on them
+so now if we save that and we go and run
+our script
+we can still see that it behaves in the
+same way incrementing everything and
+then locking that value but we've
+actually injected that dependency
+another form of dependency injection is
+setter injection so instead of actually
+setting or passing in through the
+constructor we can actually set it
+through a method so we're going to
+initialize the logger as null to start
+with we'll no longer take it as an
+argument and we're going to add a set
+logger method and that set logger method
+is going to accept a logger instance
+and then it's going to actually store it
+here in the class
+and
+what we now need to do because this
+could happen at any time because we're
+going to take out this
+we could create a new counter instance
+and then have increment and log value
+but if we actually are calling
+this.logger set logger might not have
+been called so we might not actually
+already have a logger instance available
+so we actually need to do a check here
+and say
+if
+not this dot logger so if it's falsy
+then we're going to throw a new error
+and we'll say no logger instance set
+and now if we go ahead and actually run
+the code that we have
+we'll see that that error handling code
+or error checking code that we put there
+has kicked in so we actually haven't set
+a logger instance into our class we've
+not injected that dependency so we need
+to now go and call here counter dot set
+logger and then we're going to create a
+new logger instance and pass that in to
+that setter
+so now we can just clear our console a
+bit
+and run our script again
+and we'll see that it's behaving as it
+was before so we've injected that
+dependency using a setter method this
+set logger method but we've had to do
+this extra checking here that we've
+actually got that logger available
+before we actually try and use it
+some frameworks provide dependency
+containers that can automatically inject
+dependencies we'll see this in action
+later when we take a look at the nest js
+framework
+dependency injections helps us separate
+concerns and write code that's easier to
+reuse and test
