@@ -1,0 +1,410 @@
+in this lesson we're going to add
+authentication routes to our api to
+handle the login and log out processes
+let's create a new roots file called
+auth.ts under the roots directory
+and inside of that we're going to import
+the router from express
+because we're going to be creating a
+router instance
+and let's import
+our passport instance
+from our
+passport middleware
+module
+and
+then we're going to actually create a
+new router instance so this is an
+express router instance and that will be
+the default export from
+our module
+now inside of that we're going to create
+four routes the first route is our login
+route
+and
+we're going to be passing the standard
+request response handler
+and
+this is our request handler and we're
+going to then
+inside of that do some checking so
+for this route when somebody logs in we
+want them to actually be able to go back
+to where they were before
+so it's quite common in systems that you
+will try and access a page and it will
+send redirect you to a login page but
+then you want to go back to that page
+afterwards
+so here we're checking that in the query
+string of the url that we're actually
+receiving a
+u a redirect to parameter that will
+actually allow us to then send somebody
+back afterwards
+so
+we're doing this check here we're
+checking if it's a string
+and
+making sure that it's not empty
+and then we're going to say
+if it is then we're going to send back a
+400 error code and then we're going to
+return
+with an error message so we'll actually
+call the next middleware
+which will then send back this error
+message
+so
+missing redirect to query string
+parameter
+so that then the client or user knows
+what they've done wrong now if we do
+have that redirect to it will continue
+because we've returned here if there's
+an error so it doesn't continue
+executing but here what we're going to
+do
+in the case that things are all good is
+we're going to then actually
+store that redirect to url in our
+session that we've got working with
+express session
+so request.query we're going to store
+that
+redirect to property
+in our session and then we're going to
+actually redirect to another url
+that we'll be creating in just a moment
+and that's the auth github login url
+now you'll notice that we have a type
+error here and if we mouse over it's
+because this property redirect to
+doesn't exist on the type for the
+request.session object
+and so the way we can actually fix that
+is by going and creating
+a type definition in our types file so
+let's open up index.d.t.s
+we're going to declare a type for the
+express session module
+and inside of that we're going to be
+defining the session data interface and
+then we're going to say redirect to is a
+string so now that we've made these
+changes and declared that type it's been
+merged with the types that are there
+by ex by typescript into the types for
+the express session package and now
+we've got the proper types coming
+through and we can see that it's going
+to be either a string or undefined
+so
+now we have our login route up and
+running we can go ahead and create this
+auth github login route so we're going
+to this is going to be a get request
+and we're going to be
+calling
+that particular url path there
+and then we're going to be calling the
+passport authenticate method
+and we'll be telling it to use the
+github strategy and we'll be passing
+through the scope option and this scope
+option tells github what information we
+actually want to get about the user so
+when the user comes to log in with
+github they will see on the github page
+information about what
+about what data we're trying to access
+from their account
+so the third route then that we're going
+to be creating is the github callback
+route and this is the route that will be
+called will be redirected to by github
+after a user has logged in
+and this is actually going to then
+actually handle
+the final step of the login process so
+we're going to be calling passport
+authenticate
+saying again that we're using the github
+strategy and we're going to pass through
+a couple of different options now in the
+case that
+the login with
+github failed we're going to actually
+just redirect them back to our github
+login and so to send them back to the
+login page so they can try again
+now we also need to pass this setting
+keep session info true
+to actually make sure that we don't lose
+session data when we come to this page
+so there are some security features
+built into passport that the session
+gets regenerated as
+people log in and log out but we don't
+want to lose that redirect to that we're
+setting here on the session so we're
+passing through keep session info
+is true
+now you can see there's actually a type
+error here that's unfortunately because
+the types at the moment are incorrect
+for the passport package so we're going
+to have to put a at ts ignore
+to ignore that particular error but we
+need to be really careful that
+everything we've typed here is typed
+correctly so just going to check these
+options we've got failure redirect and
+then we've got keep session info
+set to true
+so after that authenticate method has
+been called we'll then
+add another handler function
+and inside of that we're going to do a
+check for that session redirected
+property so we're going to say if type
+of request.session.redirect2
+doesn't equal string so we should have
+it set if we've gone this far with
+logging in we should have already
+handled that up here
+actually setting it in the session but
+if for whatever reason we don't have it
+we want to handle that so if it's not a
+string for some some reason it's gone
+wrong we'll return with a an error
+response status 500 so something's gone
+wrong on our side really we don't quite
+know what but we're going to return this
+500 status and end the request if things
+are okay though and we've actually got
+that redirect url we're going to
+actually redirect the user to
+dot session dot redirect to and that
+sends them back to where they were
+before
+so that's our third route github
+callback route complete the final route
+is the logout route and we're going to
+add that with
+router.get so it's another get request
+log out and then we'll add our handler
+method
+and inside of that handler we're going
+to do a similar check for a redirect to
+parameters so we can actually copy this
+from over here
+in our login route and we can pass paste
+that into the handler here
+so we're going to be checking for a
+redirect to so that after somebody's
+logged out we can redirect them back to
+where they were before or to to another
+page
+and so we're going to then grab that
+redirect url and actually store it in a
+variable
+and
+now that we have that stored we can go
+ahead and call the request.logout method
+this is actually added to the express
+request object by passport and so we're
+passing it in a callback function so
+that when it's executed we will actually
+have this callback front so once logout
+has been completed that process has been
+completed by session it will remove some
+of the session data and get rid of their
+user information
+it will then call this callback now we
+need to check if there's an error we're
+going to return next so that we don't
+actually continue executing and we'll
+just pass in that error so that express
+can do the error handling for us if
+things are okay though and they've
+logged out successfully we're going to
+redirect them to that redirect url that
+we've just stored
+here in that variable cons redirect your
+url
+so we have our four routes in place
+ready for actually
+having a full authentication flow now we
+need to go and mount these routes in
+app.ts so here we're going to say import
+authroutes
+from
+and this is from roots auth
+and then we're going to actually
+go down here and then use those roots so
+app.use and all of them are going to be
+mounted under
+the earth path
+and so that's our earth roots here
+so we have
+these our planets roots in their own
+root and then we have now our auth
+routes in their own auth router
+now we've got some tests that i've
+prepared for this
+for these auth routes so we can copy all
+of these
+and we can then go and create a new file
+under our roots directory and that'll be
+auth.test.ts
+and we can paste that in there
+now let's go ahead and run through these
+tests
+and
+see what's happening
+so now when we run them we can actually
+see we've got failures on on these new
+tests that we have and the reason for
+that is that they're expecting this
+access control allow credentials header
+to come back in the response from these
+routes now this is a special course
+header which allows for http requests
+from javascript on our web page to send
+a session cookie when making a fetch
+request
+that's really important because that
+session cookie contains the session id
+on and in our api
+express session actually will look up
+that session id to get data about the
+user and then we can actually check
+whether they're logged in or not so we
+need to make sure the client when it's
+making fetch requests with javascript
+can send through cookies and we can do
+that by sending back this access control
+allow credentials header which allows
+the browser to send through cookies to
+us
+so to actually get that in place we're
+going to go and edit the options for our
+cause middleware
+and we can update them here
+and set credentials
+true and so that then will send back
+that credentials header
+so now if we go ahead and rerun our
+tests
+for our earth route and all for all of
+our planets routes we can see that
+everything's now passing nicely
+now we can go and take a little look at
+what's going on with the auth test
+so we have two tests for our login route
+and there's a valid request where we're
+calling auth login and then we've got
+that query string so that's that query
+string operator and then query string
+parameter redirect to the same way we
+want to redirect to this url afterwards
+we're expecting a 302 response status so
+that's the http status when
+the
+server is saying i'm going to redirect
+you so it's saying we want you to
+redirect somewhere else
+and that means that we then also get a
+location field of where the client
+should be redirecting to
+and so in this case we're sending them
+to the auth github login and we're also
+making sure that our session cookie is
+getting set for the user and so that's
+done with the set cookie header that's
+all handled by express session and
+passport and then we've got our course
+headers that we're set checking we're
+checking that we've got that origin
+header and that credentials header which
+allows the client to send cookies now an
+invalid request would be if we'd
+forgotten to add in that redirect to
+query string parameter so we'll expect
+that 400 to come back
+something's wrong with that error
+message that we set
+and then for the logout we've got a
+similar setup where it's actually
+checking that the redirects are all
+happening correctly and that we've got
+the query string being passed through
+this is the valid request
+and then an invalid request where we've
+forgotten to do that and we actually get
+an error coming back
+and then for the auth github login we're
+checking that it's actually handling
+redirecting to github so this is
+actually handled by our passport github
+authentication strategy this is just
+testing that that's actually been
+integrated there and then similarly here
+for our auth callback route in this case
+with our tests we don't actually have a
+real session going on so we're just
+checking that if something's not quite
+right it's redirecting them back to go
+and log in again
+so we have all these tests in place and
+we've got this allow credentials header
+that we just added so let's go and add
+that into our planets roots because
+those will need to be able to accept the
+cookies as well so we're going to go
+here
+and we're going to
+actually add it into
+planets.test.ts
+and inside that file
+we're going to find all the places where
+we've got course headers so we've got
+access
+control
+and
+so those are our course course headers
+and we're going to then just paste in
+this extra header so this allow
+credentials header
+so we can then go and find the next spot
+where we've got it
+and this just means that we're checking
+because we want all of our routes that
+that we have for planets to actually be
+sending back this cause access control
+allow credentials headers so just adding
+these here in our test make sure that if
+we ever change the cause configuration
+that things are still working as we
+expect them to
+so we've actually done that now and it's
+set for all those routes so we can go
+ahead and run our tests and check that
+everything's working
+great so we now have all these passing
+tests
+and we've just created a brand new set
+of routes
+auth.ts roots and these will be handling
+the login and log out process for our
+api
+so let's go ahead and take a look at all
+the changes we've made
+and we can git add them
+and git
+commit
+and we'll say add auth routes
+for login and log out processes
+and then we can push all those changes
+up to github
