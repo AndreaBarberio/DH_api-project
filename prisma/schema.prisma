@@ -18,5 +18,7 @@ diameter               Int
 moons                  Int
 photoFilename          String?  @db.VarChar(255)
 createdAt              DateTime @default(now())
+createdBy              String?  @db.VarChar(255)
 updateAt               DateTime @updatedAt
+updatedBy              String?  @db.VarChar(255)
 }

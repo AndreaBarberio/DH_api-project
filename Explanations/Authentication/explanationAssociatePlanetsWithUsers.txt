@@ -1,0 +1,143 @@
+in this lesson we're going to store the
+username of the user who created or
+updated a planet in the database
+let's open up our prisma schema and on
+the planet model we're going to add two
+new fields after created that we're
+going to add a created by field and
+that's going to be a string
+and it's going to be optional so we'll
+put the question mark and we're going to
+say at db.varchar255
+so maximum length of 255 for that and
+then below updated at we're going to add
+an updated by field
+and we'll set that to a string also
+optional and we're going to then set
+that to be db.varchar255
+as well so this will allow us to
+actually
+store the username of the person who
+created the planet and the person then
+who updated it
+so we now need to go ahead and create a
+migration with prisma mpx prisma
+migrate dev and we're going to give it
+the name planet user
+and that will update our database table
+to actually set that new those new
+created by and updated by columns so
+they're available in the database and
+also there in our model now to use them
+and to actually set the data we're going
+to open up our planet's roots
+and if we take a look at our post route
+for when we create a planet
+so we currently are just passing through
+the planet data here we're going to add
+into that our username so after
+planetdata let's add in username equals
+request.user
+and
+username as a string
+so this is a string value we know it's
+always going to be a string and so we're
+setting that and if it's request or user
+exists which it should because we've
+checked that they're authorized then
+we're going to say that it's definitely
+a string we know at this point if
+they're authorized there'll be a
+username available on the
+request.userobject
+which is set by passport for us with
+that data that is pulled out of the
+session
+so to use that here we're going to then
+change it so that actually we have an
+object here
+and we're going to then
+pull out all the stuff that's in planet
+data and then we're going to say created
+by
+and use that username variable and then
+update it by
+and then use the username variable again
+so we'll be setting created by and
+updated by when a user is actually
+creating a planet
+and we're now going to go and do
+something similar for our put root so
+let's copy this username constant that
+we've got
+and head down to our put root and after
+applying a data we can add that in and
+then we're going to do a similar thing
+here but this time we're just going to
+be updating the updated by field
+and so we'll set updated by to the
+username value
+and now that will store that in the
+database when someone updates the planet
+so let's go ahead and actually test all
+of this on our front end so we're going
+to do npm run web to start up our web
+server we'll split the console and we're
+going to do an npm run build
+and then we're going to do npm start and
+that's so that the server keeps running
+because those sessions in development
+are stored in memory in our application
+and we don't want it to restart whilst
+we're testing
+so let's head over to our browser and go
+to port
+8080 on localhost
+and we can then load that up and then
+we're going to open up our add page
+and we're going to click on our login
+link
+and because we've already authorized
+github it actually accepted that we've
+authorized
+our application our oauth application
+and so it's just redirected us straight
+back here so we're now logged in and we
+can actually
+go ahead and look at creating a planet
+so we're going to create a new one we're
+going to add mercury
+and
+we'll then say that it's got 23 moons
+and then we'll add the planet
+and now that we've added it we can see
+we've got those extra fields being set
+so we've got created by being set to my
+username so that's my github username
+and then i'm logged in with and then the
+updated by field's been set as well
+so that's working really nicely and we
+can actually head back over
+into our terminal we can stop our
+running processes
+and we can go ahead and commit those
+changes
+so we get status see all those changes
+we'll get at everything
+and we'll git commit
+save
+username
+when creating or updating a planet
+so now we've got that extra information
+that we're using from that user data
+once somebody's logged in
+we now have an oauth authorization flow
+set up with github in our application
+and when someone wants to create update
+or delete a planet they're required now
+to be authenticated with our api
+and if they're authenticated
+when they create or update it we'll be
+actually saving that username
+information to our database so we know
+who created the planet
