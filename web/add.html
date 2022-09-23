@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 
 <body>
+
+    <p> <a href="http://localhost:3000/auth/login?redirectTo=http://localhost:8080/add">Login</a> </p>
     <form action="http://localhost:3000/planets" id="form-add">
         <label>
             <strong>Name:</strong>
@@ -34,7 +36,8 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: formDataJsonString
+                body: formDataJsonString,
+                credentials: "include",
             });
 
             const planet = await response.json();

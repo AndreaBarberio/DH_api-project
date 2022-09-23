@@ -1,0 +1,360 @@
+in this lesson we're going to configure
+the routes in our api that create update
+and delete planets so they require a
+user to be logged in
+we're going to create a new middleware
+function in passport.ts
+we need to first import the request
+handler
+type from the express library
+down here
+before we export we're going to now
+define a new function
+called check authorization
+and we're going to use this to actually
+help us check whether somebody is logged
+in and has a valid session
+so we're going to accept request
+response
+and next
+and then we're going to
+actually inside of that we'll have this
+handler function and that's going to say
+if request dot is authenticated
+and that's a method that's added by
+passport for us
+then we're going to return next so that
+means execute the next middleware so
+that means everything's fine they've
+logged in with github they have a valid
+user session and we're happy for that
+they're authorized to use this api route
+and we'll be adding into an api route in
+a moment
+so we set response.status if if things
+aren't okay we'll send a 401 which means
+they're not authorized to access things
+so we'll say
+response.status401 end and then we're
+going to actually export that function
+alongside the passport export so we've
+now got this new middleware ready to go
+and use and we're going to actually add
+it to our roots in planets.ts
+so if we open up planets.ts
+we can actually go ahead and import that
+middleware
+so we're going to
+import
+or move it up above here we'll say
+import
+check authorization
+and that's from
+that
+passport middleware
+so pull in that new method and then
+we're going to go and add it to routes
+that create update or delete data so
+we've got first of all our post planets
+route we're going to add it in here so
+we'll say check authorization
+and that will call that middleware it's
+the first thing before doing anything
+else and then if it's actually
+successful if it returns next it will
+call say tell express execute the next
+middleware and then it'll run the
+validation if that's successful it will
+then run the route handler but if
+they hit this route and they're not
+authorized so they don't have a valid
+login session then we will actually send
+this 401 not authorized so we've set
+that there on our post route we're going
+to do the same for our put route
+and that's when they update a planet and
+then we can go and do it again down here
+for the delete route so if they want to
+delete data
+and then here when we're uploading a
+photo we're going to add that as well
+this is a post route we don't want
+people to be able to upload photos
+unless they're logged in so now we've
+gone and added it onto all these routes
+that are post put or delete so routes
+that actually change data in our
+databases
+we've not put it on the routes where
+we're getting back all the planets or
+getting back an individual planet or
+here where we're actually allowing
+people to access photos those are all
+public bits of data and they're not
+changing anything on our database
+so let's go ahead and run our tests
+and
+see if everything's all still working
+so we've actually got quite a few
+failures here
+and we're getting this 401 unauthorized
+coming back and that's because we don't
+actually have a login session we're not
+setting that up in our tests so we need
+to go and add a mock for the passport
+module so let's actually
+open up
+passport.ts again and we're going to set
+create a mock for this check
+authorization method so that it doesn't
+break our test
+so let's open
+our create a new file and we'll call it
+passport.moc.ts
+and inside of that we're going to import
+the request handler again
+from express
+and
+then we're going to
+call jess.mock and this will allow us to
+mock
+our passport module so here we're going
+to mock it
+and then we need to give it a call back
+function
+and inside of that we're going to
+mock out the parts of the module that we
+want to change for our test so we're
+going to actually get the original
+module first
+so this will be everything we're
+exporting so we'll pull in passport and
+check authorization
+and we're going to say just.require
+actual
+and then we are getting the actual
+module
+and now we can go ahead and define a
+check authorization method
+that doesn't break our tests so if we
+look here what we've got we can copy our
+check authorization and we'll pass paste
+it down in here now we're going to
+change things so that actually it always
+calls next so we're going to just delete
+the body of this and then call
+next so it will always just execute the
+next middleware and it's not worried
+about checking whether they're actually
+authenticated
+so now we're going to return from our
+mock module we need to pass this in for
+something that just requires
+and then we're going to pull in our
+original module
+all the things are exported from that
+and then we're going to override
+that check authorization method
+and
+now that's set we've got that set up to
+pull in that mock so we need to actually
+tell
+jest to load it in just.config.js
+and we're going to put that in here
+we will copy the path for it we'll copy
+the relative path
+and then ingest config
+we're going to say dot slash and then
+the path to that passport mock
+now let's go ahead and see how our tests
+are looking
+so if we run npm test
+we can now see that everything's passing
+because we've got this mock just
+allowing it to simulate as if the user
+has authorized so our planet routes are
+all working when they when they're
+testing the create update and delete
+routes
+now to actually set things up on our web
+page we want to go to the web page that
+we've got for adding a planet and we
+need to change a couple of things here
+so first of all we're going to set
+credentials
+and we're going to set it to
+include
+and that's making sure that we send
+through the session cookie from our
+browser when we're trying to create a
+planet because we need to know who that
+user is and to be able to check if
+they're authorized if they've been
+logged in and they have a valid user
+session
+so we're making sure that we're going to
+send this in our browser so let's go and
+actually test things and we're going to
+actually
+start up
+the web server for serving up the web
+side of things serving up our web page
+but we're actually going to
+run our api in a slightly different way
+so we're going to run npm run build
+first to do a build of our api and then
+we're going to run npm start and the
+reason we're doing this is because
+when the server restarts we lose session
+data as it's stored in memory by default
+so the way we have express session set
+up right now is just storing the user
+sessions in memory and so if we're
+making changes
+normally with npm run dev it will be
+automatically restarting our server and
+we'd use lose the data so it makes it
+tricky for testing so we're doing an
+explicit npm run build and npm start and
+the server won't automatically restart
+so we need to stop it and start it again
+if we make changes but now we've got
+this running we can head over to our
+browser
+and we can open up localhost
+8080
+and then we can head over to our ad
+webpage
+now if we go and try and create a new a
+new planet so we'll call this jupiter
+and we're going to say it has 12 moons
+now if we click on add planet we'll see
+that we've got an error that's come back
+so we've got 401 unauthorized and that's
+because we haven't logged in so our
+middleware has kicked in and seen that
+we're not authenticated and sent back a
+401 unauthorized so now we're going to
+actually set up this page so we can go
+and log in to github so let's pull down
+our terminal here and then add.html
+we're going to add a link at the top
+before our form
+and this is going to be inside a
+paragraph
+and then we're going to
+set at href
+and we're going to be
+sending them to our api
+login endpoint so it's port 3000
+and then auth
+slash login
+and we require a redirect to url to be
+passed through so we want the user after
+they've logged in to come back to this
+page for adding their new planet so we
+can copy that paste it in here and this
+is where we're going to redirect them to
+after they've logged in
+and now we can actually go and set the
+text for that link to login
+and we've closed the anchor there so now
+we've got a link on our web page
+so if we refresh the page
+we'll see that we've got this login link
+and we can go ahead and click it and
+we'll start the login auth flow with
+github so now we're here and it's saying
+asking us if we want to authorize our
+space fax api or auth application to be
+able to access data on our account in
+this case it's just going to access our
+email address and so users will see this
+when they come then to log in with our
+application
+so we'll click authorize to allow it and
+it's going to redirect us back
+so what happened there was it redirected
+back to our github callback
+authentication route and then it
+actually that handled sending us back to
+the page we were on before that we set
+in that redirect to session variable so
+now we're here back on our web page we
+can actually look at going and creating
+a planet again
+so now we can enter jupiter
+one two three four and set its moons to
+six and then we can add the planet and
+now when we click it we have a
+successful request and we've got a
+response coming back and we've actually
+gone and created
+that planet in the database and if we
+actually take a look in the network of
+the request that was made we can see
+that we're sending through
+in the fetch request we're sending
+through that cookie which contains our
+session id and that's what we then using
+to look up the session
+in our application to check and see that
+the user the user has logged in and that
+they're authorized to be able to go and
+make this change so that's why we're
+allowing them then to create the planner
+and accepting the data that they sent
+through
+now that we have this working let's
+actually head over to the
+login url so we're going to go to
+port 3000
+and we're going to say auth
+log out
+and we're going to pass through
+the page this url here
+and we're going to that will actually
+log us out and redirect back
+now if we go ahead and try and create
+a
+planet
+and we click add planet we'll see that
+we get
+a response saying 401 unauthorized
+because we've logged out and so our
+session is no longer authorized we're
+not no longer a logged in user and our
+api is stopping us from being able to
+create a planet
+so we've got a complete authentication
+flow now working so we can log in with
+github and actually then use that to
+check when we're trying to create a
+planet that the user is logged in and if
+they're not then we'll send them back
+this 401 unauthorized and then they can
+go through the login flow to log in with
+github
+now let's go ahead and head back into
+our terminal
+and we're going to
+close this terminal here and we can go
+ahead and see all the changes we've made
+and we're going to
+add all of those
+and then commit them
+and so then we've got we're going to say
+that we've configured the protected
+routes so those create update and delete
+using post put and delete methods
+and we can then push all the changes
+up to github
+we've got a complete authentication flow
+using github working in our application
+and we're now checking the users are
+authorized to be able to create update
+or delete planets
+there's one last thing to do and that's
+to actually set the username for a user
+against a planet when they create or
+update it

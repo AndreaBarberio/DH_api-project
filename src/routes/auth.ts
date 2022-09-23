@@ -17,7 +17,7 @@ router.get("/login", (request, response, next) => {
 });
 
 router.get(
-    "/auth/github/login",
+    "/github/login",
     passport.authenticate("github", {
         scope: ["user:email"],
     })
@@ -50,7 +50,7 @@ router.get("/logout", (request, response, next) => {
 
     const redirectUrl = request.query.redirectTo;
     request.logout((error) => {
-        if(error){
+        if (error) {
             return next(error);
         }
         response.redirect(redirectUrl);
