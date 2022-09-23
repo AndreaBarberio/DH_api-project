@@ -1,0 +1,26 @@
+design patterns describe repeatable ways
+of writing code
+they're reusable solutions to common
+code design problems and each design
+pattern solves a different problem an
+influential book about design patterns
+is design patterns the elements of
+reusable object-oriented software it was
+published in 1994 by a group of authors
+known as the gang of four
+the book describes 23 design patterns
+and they fall into three different
+categories
+creational structural and behavioral
+creational patterns focus on the
+creation of objects
+whereas structural patterns focus on
+class and object composition
+behavioral patterns focus on
+communication between objects
+each programming language has different
+ways of implementing established design
+patterns in this unit we're going to
+learn how to apply the singleton adapter
+decorator and dependency injector
+patterns in our node.js applications

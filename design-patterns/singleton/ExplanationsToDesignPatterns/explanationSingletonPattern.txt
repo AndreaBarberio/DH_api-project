@@ -1,0 +1,159 @@
+in this lesson we're going to learn
+about the singleton design pattern and
+how to apply it in node.js
+the singleton pattern is a creational
+design pattern it restricts object
+creation for a class to a single
+instance and centralizes access to that
+instance it can be useful for sharing
+stateful information
+optimizing resource usage or for
+synchronizing access to a resource
+let's apply the singleton design pattern
+in some code
+we're going to create a new file counter
+dot mjs
+inside of that we're going to create a
+class called counter
+and this class is going to store some
+states so we're going to actually store
+a number that we're going to be
+incrementing so we'll initialize it in
+the constructor set this dot count to
+zero and then we're going to add an
+increment method and this increment
+method is going to
+increment the count value so each time
+this method's called it will increase
+the count value by 1.
+so we are going to actually
+now
+then use this by actually creating a
+single instance of this class so rather
+than exporting the class from this
+module we're going to say export const
+and we're going to create a counter
+instance
+and then that will be a new instance of
+our counter class
+so you won't actually be able to access
+this class outside of our module we will
+only be able to access this instance of
+the counter class this is a singleton
+and so now we're going to actually go
+and use it in
+index.mjs so createindex.mjs
+and we're going to import the counter
+instance
+from
+our
+dot mjs
+and
+then we'll call counter instance
+dot increment
+to actually increment the value and then
+we're going to log it out to actually
+see the value of that
+so we're going to access
+counter instance
+dot count
+so we now have this script which is
+using our counter instance our singleton
+and we're going to run it with node
+index.mjs
+so when we run that we can see the count
+is one because we've called the counter
+instance increment method once
+now
+if we go ahead and actually create some
+other scripts which you're using we'll
+use the counter instance we can go here
+to
+create script one dot mjs
+and inside of that we're going to copy
+and paste the same code here where we
+import and then we call the increment
+method and then we'll create another
+script script two which does the same
+now to use these scripts we're going to
+import them here into
+our
+index.mjs so we're going to import
+script one
+and
+we're going to
+that will then run that script
+so we can then copy that again
+so we've got these two imports so these
+are these imports are importing script
+one and script two both of which are
+accessing that counter instance that's
+singleton
+and then calling the increment method
+now if we go ahead and run our script
+again
+we'll see that the count is three
+so the actual counter instance is shared
+across all of these scripts
+node.js actually caches a module the
+first time it's imported so in script
+one which is the first script to import
+the counter is counter instance is then
+cached in memory by node.js so
+when whenever we actually have another
+import statement statement for it so
+here we have another import it's
+accessing that same counter instance
+it's not creating new versions each time
+and because we're actually exporting
+this single instance this singleton we
+are able to have this shared state
+across the scripts where the counter is
+the same counter
+and we're actually then able to actually
+have that shared state that shared
+counter value and then we actually can
+see that every call to increment is
+happening on the same instance of our
+counter class and then we can prove that
+by outputting the value here
+we can actually refactor counter.mjs
+because this counter instance could
+actually be an object literal so
+we can do this by actually changing it
+to an object literal so here's an object
+literal and we'll say count zero
+and then we can actually have an
+increment method the same as we have
+and then say this dot count plus plus
+and then we can remove this so this is a
+different way of creating a singleton we
+don't actually necessarily always need
+to create a class we're going to be
+exporting the single counter instance
+this singleton and that will be used in
+the same way
+by these scripts and shared across them
+all
+so now if we actually go and run our
+script
+we can see that it still has the same
+behavior when we use an object literal
+for a singleton so this is a specific
+feature of something we can do in
+node.js because of the fact that we can
+have a single
+constant this instance this object
+exported from a module allowing us to
+actually
+have this shared state and this
+singleton instance
+a common use case for the singleton
+design pattern in a node.js application
+is a database class that manages a pool
+of database connections we want a single
+instance of this class for our
+application we don't want to create a
+new database class instance for every
+request that we receive the singleton
+pattern is a good way of achieving this
