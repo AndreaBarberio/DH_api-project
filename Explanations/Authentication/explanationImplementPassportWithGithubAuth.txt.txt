@@ -392,3 +392,135 @@ and then we can go ahead and push
 everything up to get help
 we've just configured passport so that
 users can log in with github
+
+
+
+in this lesson we're going to create a
+github oauth application and then
+configure our passport authentication
+strategy to use it
+at the moment when we're creating our
+passport github 2 strategy we're passing
+through empty strings for the client id
+secret and callback url so we need to go
+over to github and actually create an
+oauth application so we head to settings
+and then scroll down
+and head over to developer settings and
+then oauth apps
+and then we click the register a new
+application
+and we're going to call this space fax
+api
+and then in brackets we're going to put
+development because we'll only be using
+this oauth app in development and then
+we're going to set the home page url to
+localhost
+port 3000 so that's our local
+development url for our api
+and then we're going to copy that
+paste it into the authorization callback
+url field
+and then we're going to say
+auth slash github
+callback and this is a authentication
+url that we're going to create shortly
+so then we click register application
+and we've now got our oauth application
+created so we can see we have a client
+id and we actually need to go and
+actually set this in our emv file
+because we'll be using it in our
+application
+so let's actually open up our emv file
+and we're going to create some new
+configuration settings so github client
+id we need to set a value for that
+github client secret
+and then also
+github callback url
+we're going to be using all of these to
+configure our passport authentication
+strategy so if we take a look here we
+can copy the client id with control c
+and then paste it here into our emv file
+now to get the secret we need to click
+on generate a new client secret
+we'll click on that and now we're asked
+to enter our password for our account
+we can enter our password
+and then confirm so now we've generated
+our client secret and we can see here
+that we need to copy the secret because
+we won't actually be able to see it
+again so we click on this little copy
+icon here and that's copied it to our
+clipboard and back in vs code we're
+going to paste it into our emv file
+and save that and then back here we're
+also going to copy our callback url that
+we've set on our os application we copy
+that and then paste that into our emv
+file
+so we've now got all those github oauth
+app settings in our emv file and the
+github oauth app is needed for us to be
+able to actually set up our application
+to authenticate with github
+so now that's all in place we're going
+to use these new environment variables
+in our config.ts
+so here in config.ts we're going to
+paste in
+all of those settings
+so do process.emv and then github client
+id
+and then we'll have that fallback to
+missing setting if we forget to set it
+and let's copy and paste these
+and then we can go and replace their
+values so github client secret we'll set
+that here and then we're going to do the
+same for the callback url
+so now we have the github client id the
+client secret and the callback url all
+being pulled out from our environment
+variables and now we just need to go and
+use them in passport.ts
+so in passport.ts we're going to import
+our configuration
+and then we can go ahead and actually
+use them here so just to make sure we're
+getting them right we're going to copy
+and paste their names so first we'll
+pass in the client id
+and then we're going to do the same for
+client secret so be github
+client secret
+and then we can actually do the same for
+the callback url
+callback url
+so now we've actually got everything
+configured we're securely storing these
+github oauth application settings here
+in our emv file the secret is important
+that it stays in our environment
+variable so we don't commit it into our
+code base
+so we've got those set up here and then
+we're passing them in to our github
+authentication strategy
+now if we go ahead and actually run our
+tests
+we should see that everything is passing
+and we've got everything nicely
+configured with passport ready to go so
+let's run git status
+and we're going to add those changes
+and then we can commit them
+so configure
+github
+authentication strategy
+and then we can put all that up to
+github
